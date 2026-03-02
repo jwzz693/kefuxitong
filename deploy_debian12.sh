@@ -274,7 +274,7 @@ for _i in $(seq 1 30); do
 done
 
 if [[ "$DB_READY" != "true" ]]; then
-    warn "数据库服务无法启动，彻底清理后重新安装..."
+    warn "数据库服务无法启动，执行自愈重装流程..."
 
     # 1) 停止所有数据库相关进程
     systemctl stop mariadb 2>/dev/null || true
@@ -283,40 +283,54 @@ if [[ "$DB_READY" != "true" ]]; then
     killall -9 mysqld mariadbd mysqld_safe 2>/dev/null || true
     sleep 1
 
-    # 2) 彻底卸载所有 MySQL/MariaDB 包
-    apt-get remove -y --purge 'mariadb-*' 'mysql-*' 'galera-*' >/dev/null 2>&1 || true
+    # 2) 仅精准卸载数据库服务包（避免误删 php7.4-mysql）
+    apt-get remove -y --purge mariadb-server mariadb-client mariadb-common mysql-server mysql-client galera-4 >/dev/null 2>&1 || true
     apt-get autoremove -y --purge >/dev/null 2>&1 || true
-    dpkg --purge $(dpkg -l | grep -iE 'mariadb|mysql|galera' | awk '{print $2}') 2>/dev/null || true
+    DB_PURGE_LIST=$(dpkg -l | awk '/^ii/ && $2 ~ /^(mariadb|mysql-server|mysql-client|galera)/ {print $2}')
+    if [[ -n "$DB_PURGE_LIST" ]]; then
+        dpkg --purge $DB_PURGE_LIST >/dev/null 2>&1 || true
+    fi
 
-    # 3) 彻底删除所有残留数据和配置
+    # 3) 彻底删除残留数据与运行文件
     rm -rf /var/lib/mysql /var/lib/mysql-* /var/lib/mysql-files /var/lib/mysql-keyring 2>/dev/null || true
     rm -rf /etc/mysql /etc/mysql* 2>/dev/null || true
     rm -rf /var/log/mysql /var/log/mysql* 2>/dev/null || true
     rm -rf /run/mysqld /var/run/mysqld 2>/dev/null || true
-    rm -f /tmp/mysql.sock /tmp/mysqld.sock 2>/dev/null || true
+    rm -f /tmp/mysql.sock /tmp/mysqld.sock /var/lib/mysql/aria_log.* /var/lib/mysql/ib_logfile* 2>/dev/null || true
 
-    # 4) 重建必要目录
-    mkdir -p /var/run/mysqld
-    chown mysql:mysql /var/run/mysqld 2>/dev/null || true
+    # 4) 重建 mysql 用户和目录（部分系统被清理后会丢失）
+    if ! id mysql >/dev/null 2>&1; then
+        useradd -r -M -s /usr/sbin/nologin -d /nonexistent mysql 2>/dev/null || true
+    fi
+    mkdir -p /run/mysqld /var/lib/mysql
+    chown -R mysql:mysql /run/mysqld /var/lib/mysql 2>/dev/null || true
+    chmod 755 /run/mysqld 2>/dev/null || true
 
-    # 5) 全新安装
+    # 5) 全新安装并补齐 dpkg 配置
     info "执行全新安装 MariaDB..."
     apt-get update -qq >/dev/null 2>&1 || true
     apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 重装失败"
+    dpkg --configure -a >/dev/null 2>&1 || true
 
-    # 6) 如果 systemd 服务还是不行，手动初始化数据目录
+    # 6) 启动服务；失败则手动初始化 + fallback 启动
     if ! systemctl start mariadb 2>/dev/null; then
-        warn "首次启动失败，尝试手动初始化数据目录..."
-        mysql_install_db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || \
-        mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || true
-        chown -R mysql:mysql /var/lib/mysql 2>/dev/null || true
-        systemctl start mariadb || err "MariaDB 启动失败（已尝试手动初始化）\n请执行: journalctl -xeu mariadb.service 查看详细日志"
+        warn "systemd 启动失败，尝试初始化数据目录后重试..."
+        mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || \
+        mysql_install_db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || true
+        chown -R mysql:mysql /var/lib/mysql /run/mysqld 2>/dev/null || true
+
+        if ! systemctl start mariadb 2>/dev/null; then
+            warn "再次失败，尝试 mysqld_safe 回退启动..."
+            nohup mysqld_safe --user=mysql --datadir=/var/lib/mysql >/var/log/mysql_fallback.log 2>&1 &
+            sleep 5
+            mysqladmin ping >/dev/null 2>&1 || err "MariaDB 启动失败（systemd + fallback 均失败）\n请执行: journalctl -xeu mariadb.service"
+        fi
     fi
 
     systemctl enable mariadb >/dev/null 2>&1 || true
     sleep 3
     mysqladmin ping >/dev/null 2>&1 || err "数据库多次安装失败，请执行: journalctl -xeu mariadb.service 查看日志"
-    ok "数据库彻底重装成功"
+    ok "数据库自愈重装成功"
 fi
 
 # ---- 确定 root 连接认证方式 ----
