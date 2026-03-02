@@ -10,3 +10,5 @@ runtime/*
 .vscode/
 *.swp
 Thumbs.db
+*.log
+service/vendor/workerman/workerman.log
