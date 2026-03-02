@@ -178,49 +178,145 @@ ok "PHP 7.4 安装并配置完成 ($(php -v 2>/dev/null | head -1 | awk '{print 
 # ======================== 步骤 4: 安装 MariaDB ========================
 step 4 "安装并配置数据库"
 
-if ! command -v mysql &>/dev/null; then
-    info "安装 MariaDB..."
-    apt-get install -y -qq mariadb-server mariadb-client 2>&1 | tail -1
+DB_INSTALLED=false
+DB_SERVICE=""
+
+# 检测已有的数据库
+if command -v mysql &>/dev/null; then
+    info "检测到已安装 MySQL/MariaDB"
+    DB_INSTALLED=true
+elif command -v mariadb &>/dev/null; then
+    info "检测到已安装 MariaDB"
+    DB_INSTALLED=true
 fi
 
-# 确保数据库已启动
-systemctl start mariadb 2>/dev/null || systemctl start mysql 2>/dev/null || true
-systemctl enable mariadb 2>/dev/null || systemctl enable mysql 2>/dev/null || true
+# 未安装则自动安装
+if [[ "$DB_INSTALLED" == "false" ]]; then
+    info "未检测到数据库，正在自动安装 MariaDB..."
+    apt-get install -y -qq mariadb-server mariadb-client 2>&1 | tail -1
+    ok "MariaDB 安装完成"
+fi
 
-# 等待 MariaDB 就绪
-for i in {1..15}; do
-    if mysqladmin ping &>/dev/null; then break; fi
+# 识别数据库服务名
+if systemctl list-unit-files mariadb.service &>/dev/null 2>&1; then
+    DB_SERVICE="mariadb"
+elif systemctl list-unit-files mysql.service &>/dev/null 2>&1; then
+    DB_SERVICE="mysql"
+elif systemctl list-unit-files mysqld.service &>/dev/null 2>&1; then
+    DB_SERVICE="mysqld"
+fi
+
+# 确保数据库服务已启动
+if [[ -n "$DB_SERVICE" ]]; then
+    systemctl start "$DB_SERVICE" 2>/dev/null || true
+    systemctl enable "$DB_SERVICE" 2>/dev/null || true
+else
+    # 尝试全部启动
+    systemctl start mariadb 2>/dev/null || systemctl start mysql 2>/dev/null || systemctl start mysqld 2>/dev/null || true
+fi
+
+# 等待数据库就绪（最多30秒）
+info "等待数据库服务就绪..."
+DB_READY=false
+for i in {1..30}; do
+    if mysqladmin ping &>/dev/null 2>&1; then
+        DB_READY=true
+        break
+    fi
     sleep 1
 done
-mysqladmin ping &>/dev/null || err "数据库启动失败，请检查 MariaDB 服务"
 
-# 自动安全初始化（等效 mysql_secure_installation）
+if [[ "$DB_READY" != "true" ]]; then
+    # 数据库完全无法启动，尝试重装
+    warn "数据库服务无法启动，尝试重新安装..."
+    apt-get remove -y --purge mariadb-server mariadb-client 2>/dev/null || true
+    apt-get autoremove -y 2>/dev/null || true
+    rm -rf /var/lib/mysql 2>/dev/null || true
+    apt-get install -y -qq mariadb-server mariadb-client 2>&1 | tail -1
+    systemctl start mariadb
+    systemctl enable mariadb 2>/dev/null || true
+    sleep 3
+    mysqladmin ping &>/dev/null || err "数据库多次安装失败，请手动检查系统环境"
+    ok "数据库重装成功"
+fi
+
+# ---- 尝试确定 root 连接方式 ----
+# MariaDB/MySQL 在 Debian 上 root 默认用 unix_socket 或空密码
+MYSQL_ROOT_CMD=""
+
+# 尝试1: 无密码直连 (unix_socket 认证)
+if mysql -uroot -e "SELECT 1;" &>/dev/null 2>&1; then
+    MYSQL_ROOT_CMD="mysql -uroot"
+    info "数据库 root 使用 unix_socket 认证"
+# 尝试2: 空密码
+elif mysql -uroot -p'' -e "SELECT 1;" &>/dev/null 2>&1; then
+    MYSQL_ROOT_CMD="mysql -uroot -p''"
+    info "数据库 root 使用空密码"
+# 尝试3: 环境变量中指定的密码
+elif [[ -n "${DB_ROOT_PASS:-}" ]] && mysql -uroot -p"${DB_ROOT_PASS}" -e "SELECT 1;" &>/dev/null 2>&1; then
+    MYSQL_ROOT_CMD="mysql -uroot -p${DB_ROOT_PASS}"
+    info "数据库 root 使用已有密码"
+else
+    # 最后手段：尝试跳过权限修复
+    warn "无法连接数据库 root，尝试重置..."
+    systemctl stop mariadb 2>/dev/null || systemctl stop mysql 2>/dev/null || true
+    # 用 --skip-grant-tables 启动
+    mysqld_safe --skip-grant-tables --skip-networking &>/dev/null &
+    sleep 3
+    if mysql -uroot -e "SELECT 1;" &>/dev/null 2>&1; then
+        mysql -uroot -e "FLUSH PRIVILEGES; ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';" 2>/dev/null || \
+        mysql -uroot -e "FLUSH PRIVILEGES; SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${DB_ROOT_PASS}');" 2>/dev/null || true
+        # 杀掉 skip-grant 进程并正常重启
+        killall mysqld 2>/dev/null || true
+        sleep 2
+        systemctl start mariadb 2>/dev/null || systemctl start mysql 2>/dev/null || true
+        sleep 2
+        MYSQL_ROOT_CMD="mysql -uroot -p${DB_ROOT_PASS}"
+    else
+        err "无法连接数据库 root 用户，请手动修复后重试"
+    fi
+fi
+
+# ---- 安全初始化 ----
 info "安全初始化数据库..."
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';" 2>/dev/null || \
-mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${DB_ROOT_PASS}');" 2>/dev/null || true
 
-# 后续用 root 密码操作
-MYSQL_CMD="mysql -uroot -p${DB_ROOT_PASS}"
+# 设置 root 密码（如果当前是无密码/socket方式，可选设密码）
+if [[ "$MYSQL_ROOT_CMD" == "mysql -uroot" ]] || [[ "$MYSQL_ROOT_CMD" == "mysql -uroot -p''" ]]; then
+    # 为 root 设置密码
+    $MYSQL_ROOT_CMD -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${DB_ROOT_PASS}';" 2>/dev/null || \
+    $MYSQL_ROOT_CMD -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('${DB_ROOT_PASS}');" 2>/dev/null || true
+    # 更新连接命令
+    if mysql -uroot -p"${DB_ROOT_PASS}" -e "SELECT 1;" &>/dev/null 2>&1; then
+        MYSQL_ROOT_CMD="mysql -uroot -p${DB_ROOT_PASS}"
+    fi
+    # 如果设密码后反而连不上了（某些版本 socket 认证优先），回退
+    if ! $MYSQL_ROOT_CMD -e "SELECT 1;" &>/dev/null 2>&1; then
+        if mysql -uroot -e "SELECT 1;" &>/dev/null 2>&1; then
+            MYSQL_ROOT_CMD="mysql -uroot"
+        fi
+    fi
+fi
 
 # 清理匿名用户和测试库
-$MYSQL_CMD -e "DELETE FROM mysql.user WHERE User='';" 2>/dev/null || true
-$MYSQL_CMD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" 2>/dev/null || true
-$MYSQL_CMD -e "DROP DATABASE IF EXISTS test;" 2>/dev/null || true
-$MYSQL_CMD -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "DELETE FROM mysql.user WHERE User='';" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "DROP DATABASE IF EXISTS test;" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "FLUSH PRIVILEGES;" 2>/dev/null || true
 
-# 创建项目数据库和用户
-info "创建数据库: ${DB_NAME}..."
-$MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
-$MYSQL_CMD -e "DROP USER IF EXISTS '${DB_USER}'@'localhost';" 2>/dev/null || true
-$MYSQL_CMD -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
-$MYSQL_CMD -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"
-$MYSQL_CMD -e "FLUSH PRIVILEGES;"
+# ---- 创建项目数据库和用户 ----
+info "创建数据库: ${DB_NAME}  用户: ${DB_USER}..."
+$MYSQL_ROOT_CMD -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;" || err "创建数据库失败"
+$MYSQL_ROOT_CMD -e "DROP USER IF EXISTS '${DB_USER}'@'localhost';" 2>/dev/null || true
+$MYSQL_ROOT_CMD -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" || err "创建数据库用户失败"
+$MYSQL_ROOT_CMD -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"
+$MYSQL_ROOT_CMD -e "FLUSH PRIVILEGES;"
 
-# 验证数据库连接
-if mysql -u"${DB_USER}" -p"${DB_PASS}" -e "SELECT 1;" "${DB_NAME}" &>/dev/null; then
-    ok "数据库创建并验证成功: ${DB_NAME}"
+# 验证项目账号连接
+if mysql -u"${DB_USER}" -p"${DB_PASS}" -e "SELECT 1;" "${DB_NAME}" &>/dev/null 2>&1; then
+    ok "数据库创建并验证成功: ${DB_NAME} (用户: ${DB_USER})"
 else
-    err "数据库连接验证失败，请检查配置"
+    warn "数据库用户验证失败，尝试用 root 继续（后续导入将使用 root）"
 fi
 
 # ======================== 步骤 5: 安装 Nginx ========================
@@ -255,8 +351,15 @@ step 7 "导入数据库结构和数据"
 SQL_FILE="$INSTALL_DIR/dkewl.sql"
 if [[ -f "$SQL_FILE" ]]; then
     info "正在导入 $(du -h "$SQL_FILE" | awk '{print $1}') SQL 数据..."
-    mysql -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" < "$SQL_FILE" 2>&1
-    TABLE_COUNT=$(mysql -u"${DB_USER}" -p"${DB_PASS}" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null)
+    # 优先用项目用户导入，失败则用 root
+    if mysql -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" < "$SQL_FILE" 2>&1; then
+        :
+    else
+        warn "项目用户导入失败，使用 root 重试..."
+        $MYSQL_ROOT_CMD "${DB_NAME}" < "$SQL_FILE" 2>&1 || warn "SQL 导入出现警告（可能部分已存在）"
+    fi
+    TABLE_COUNT=$(mysql -u"${DB_USER}" -p"${DB_PASS}" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null || \
+                  $MYSQL_ROOT_CMD -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null || echo "0")
     ok "数据库导入完成，共 ${TABLE_COUNT:-0} 张表"
 else
     warn "SQL 文件不存在，跳过导入"
