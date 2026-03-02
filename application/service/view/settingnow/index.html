@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css"/>
+    	<script src="/static/js/cupload.js"></script>
+    <style>
+        .layui-form-label{
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<form class="layui-row layui-col-space10 layui-form">
+    <div class="layui-col-md12">
+        <div class="layui-card" style="margin-left: 20px;margin-top: 20px;">
+            <div class="layui-card-header">商户设置</div>
+      
+                <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">关于我们</label>
+                <div class="layui-input-inline">
+             <textarea class="editormd-markdown-textarea" name="aboutus" id="a_editormd" style="height: 260px;width: 600px;">{$business['aboutus']}</textarea>
+              
+                </div>
+            </div>
+                <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">LOGO图上传</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-3"></div>
+                </div>
+            </div>
+             <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">广告图/1(建议尺寸：300x220)</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-4"></div>
+                </div>
+            链接：       <input name="imgurl2" value="{$business['imgurl2']}" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"/>
+            </div>
+                        <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">广告图/2(建议尺寸：300x220)</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-5"></div>
+                </div>
+           链接：        <input name="imgurl3" value="{$business['imgurl3']}" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"/>
+            </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">广告图/3(建议尺寸：300x220)</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-6"></div>
+                </div>
+             链接：      <input name="imgurl4" value="{$business['imgurl4']}" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"/>
+            </div>
+                          <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">广告图/4(建议尺寸：300x220)</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-7"></div>
+                </div>
+            链接：       <input name="imgurl5" value="{$business['imgurl5']}" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"/>
+            </div>
+                          <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 220px">广告图/5(建议尺寸：300x220)</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-8"></div>
+                </div>
+               链接：  <input name="imgurl6" value="{$business['imgurl6']}" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"/>
+            </div>
+            <div class="layui-input-block" style="min-height: 80px;">
+                <button type="submit" class="pear-btn pear-btn-primary" lay-submit="" lay-filter="save">保存</button>
+                <button type="reset" class="pear-btn">重置</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script src="/static/component/layui/layui.js"></script>
+<script src="/static/component/pear/pear.js"></script>
+<script type="text/javascript" src="__assets__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__assets__/ueditor/ueditor.all.js"></script>
+<script type="text/javascript" src="__libs__/jquery/jquery.min.js"></script>
+<script>
+    var editorOption = {
+        UEDITOR_HOME_URL: "__assets__/ueditor/",
+        UEDITOR_ROOT_URL: "__assets__/ueditor/",
+        serverUrl: "{:url('/service/upload/ueditor',['action'=>'config','service_id'=>$_SESSION['Msg']['service_id'],'admin_id'=>0])}",
+        lang: "zh-cn",
+        toolbars: [["source","undo", "redo", "|", "bold", "italic", "underline", "fontborder", "strikethrough", "superscript", "subscript", "removeformat", "formatmatch", "autotypeset", "blockquote", "pasteplain", "|", "forecolor", "backcolor",  "selectall", "cleardoc", "|","lineheight", "|", "customstyle", "paragraph", "fontfamily", "fontsize", "|",  "link", "unlink","|", "simpleupload", "insertimage", "emotion","insertvideo"]],
+        initialContent: "",
+        pageBreakTag: "_ueditor_page_break_tag_",
+        initialFrameWidth: "100%",
+        initialFrameHeight: "260",
+        initialStyle: "body{font-size:14px}",
+        autoFloatEnabled: false,
+        allowDivTransToP: true,
+        autoHeightEnabled: false,
+        charset: "utf-8",
+    };
+    var DomUe=UE.getEditor("a_editormd",editorOption)
+    layui.use(['form', 'jquery'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        form.on('submit(save)', function (data) {
+            $.ajax({
+                data: JSON.stringify(data.field),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'post',
+                success: function (res) {
+                    if (res.code === 1) {
+                        layer.msg(res.msg, {
+                            icon: 1
+                        }, function() {
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg(res.msg, {icon: 2, time: 1500})
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+    function tpl(name)
+    {
+        layer.open({
+            type: 2,
+            skin:"tablist",
+            title:"教程",
+            area: ['1020px', '800px'],shadeClose:true,
+            content: '/assets/images/admin/'+name+'.png'
+        });
+    }
+
+    function creattoken(d,len=32){
+        var $chars = 'I1UuVv9gqoOLlABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+        var maxPos = $chars.length;
+        var pwd = '';
+        for (i = 0; i < len; i++) {
+            pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+        }
+        $(d).val(pwd);
+        return false;
+    }
+</script>
+	<script type="text/javascript">
+			var cupload3 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-3',
+             deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+			data: ["{$business['img1']}"],
+		});
+			var cupload4 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-4',
+	 deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+					data: ["{$business['img2']}"],
+		});
+					var cupload5 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-5',
+ deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+					data: ["{$business['img3']}"],
+		});
+					var cupload6 = new Cupload ({
+				name: "img",
+			ele	 : '#cupload-6',
+ deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+					data: ["{$business['img4']}"],
+		});
+					var cupload7 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-7',
+ deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+					data: ["{$business['img5']}"],
+		});
+							var cupload8 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-8',
+ deleteUrl: "/service/Settingnow/del", // 删除url,删除时同时删除服务器图片,不写不删，非必需,无默认值 
+			num  : 1,
+			url  : '/service/Settingnow/upload',
+					data: ["{$business['img6']}"],
+		});
+	</script>
+</body>
+</html>

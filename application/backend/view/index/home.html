@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>控制台</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/static/admin/css/other/console1.css" />
+		<style id="pearadmin-bg-color"></style>
+		<style>
+			body.pear-container {
+				background: #f1f5f9;
+				padding: 20px;
+			}
+
+			/* 欢迎区域 */
+			.welcome-banner {
+				background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+				border-radius: 16px;
+				padding: 32px 36px;
+				color: #fff;
+				margin-bottom: 24px;
+				position: relative;
+				overflow: hidden;
+				box-shadow: 0 8px 32px rgba(99,102,241,0.25);
+			}
+
+			.welcome-banner::before {
+				content: '';
+				position: absolute;
+				top: -50%;
+				right: -20%;
+				width: 400px;
+				height: 400px;
+				background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+				border-radius: 50%;
+			}
+
+			.welcome-banner::after {
+				content: '';
+				position: absolute;
+				bottom: -30%;
+				right: 10%;
+				width: 200px;
+				height: 200px;
+				background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+				border-radius: 50%;
+			}
+
+			.welcome-banner h2 {
+				font-size: 24px;
+				font-weight: 700;
+				margin: 0 0 8px 0;
+				position: relative;
+				z-index: 1;
+			}
+
+			.welcome-banner p {
+				font-size: 14px;
+				opacity: 0.85;
+				margin: 0;
+				position: relative;
+				z-index: 1;
+			}
+
+			/* 统计卡片 */
+			.stat-card {
+				background: #fff;
+				border-radius: 16px;
+				padding: 24px;
+				box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
+				border: 1px solid rgba(0,0,0,0.04);
+				transition: all .3s cubic-bezier(.4,0,.2,1);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.stat-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+			}
+
+			.stat-card .stat-icon {
+				width: 52px;
+				height: 52px;
+				border-radius: 14px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 24px;
+				margin-bottom: 16px;
+			}
+
+			.stat-card .stat-icon.blue    { background: #eff6ff; color: #3b82f6; }
+			.stat-card .stat-icon.green   { background: #ecfdf5; color: #10b981; }
+			.stat-card .stat-icon.orange  { background: #fff7ed; color: #f97316; }
+			.stat-card .stat-icon.purple  { background: #faf5ff; color: #8b5cf6; }
+
+			.stat-card .stat-label {
+				font-size: 13px;
+				color: #94a3b8;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				margin-bottom: 8px;
+			}
+
+			.stat-card .stat-value {
+				font-size: 28px;
+				font-weight: 700;
+				color: #1e293b;
+				line-height: 1.2;
+				margin-bottom: 12px;
+			}
+
+			.stat-card .stat-footer {
+				font-size: 13px;
+				color: #64748b;
+				padding-top: 12px;
+				border-top: 1px solid #f1f5f9;
+			}
+
+			.stat-card .stat-footer strong {
+				color: #334155;
+			}
+
+			.stat-card::after {
+				content: '';
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 100px;
+				height: 100px;
+				border-radius: 0 16px 0 100%;
+				opacity: 0.03;
+			}
+
+			.stat-card:nth-child(1)::after { background: #3b82f6; }
+			.stat-card:nth-child(2)::after { background: #10b981; }
+			.stat-card:nth-child(3)::after { background: #f97316; }
+			.stat-card:nth-child(4)::after { background: #8b5cf6; }
+
+			/* 间距调整 */
+			.layui-row.stat-row { margin: 0 -10px; }
+			.stat-row .layui-col-xs6,
+			.stat-row .layui-col-md3 { padding: 0 10px; margin-bottom: 20px; }
+
+			/* 动画 */
+			@keyframes fadeInUp {
+				from { opacity: 0; transform: translateY(20px); }
+				to { opacity: 1; transform: translateY(0); }
+			}
+
+			.stat-card { animation: fadeInUp .5s ease-out backwards; }
+			.stat-row > div:nth-child(1) .stat-card { animation-delay: .05s; }
+			.stat-row > div:nth-child(2) .stat-card { animation-delay: .10s; }
+			.stat-row > div:nth-child(3) .stat-card { animation-delay: .15s; }
+			.stat-row > div:nth-child(4) .stat-card { animation-delay: .20s; }
+
+			.welcome-banner { animation: fadeInUp .4s ease-out; }
+		</style>
+	</head>
+	<body class="pear-container">
+		<!-- 欢迎横幅 -->
+		<div class="welcome-banner">
+			<h2>欢迎回来 👋</h2>
+			<p>客服管理中心 — 实时掌控业务数据，高效管理客服团队</p>
+		</div>
+
+		<!-- 数据卡片 -->
+		<div class="layui-row stat-row">
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="stat-card">
+					<div class="stat-icon blue">
+						<i class="layui-icon layui-icon-group"></i>
+					</div>
+					<div class="stat-label">商户总数</div>
+					<div class="stat-value">{$data['total_business']}</div>
+					<div class="stat-footer">客服总数：<strong>{$data['total_service']}</strong></div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="stat-card">
+					<div class="stat-icon green">
+						<i class="layui-icon layui-icon-user"></i>
+					</div>
+					<div class="stat-label">当前排队用户</div>
+					<div class="stat-value">{$data['total_waiter']}</div>
+					<div class="stat-footer">接待总用户：<strong>{$data['total_int']}</strong></div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="stat-card">
+					<div class="stat-icon orange">
+						<i class="layui-icon layui-icon-dialogue"></i>
+					</div>
+					<div class="stat-label">今日聊天消息</div>
+					<div class="stat-value">{$data['now_chats']}</div>
+					<div class="stat-footer">消息总数：<strong>{$data['total_chats']}</strong></div>
+				</div>
+			</div>
+			<div class="layui-col-xs6 layui-col-md3">
+				<div class="stat-card">
+					<div class="stat-icon purple">
+						<i class="layui-icon layui-icon-praise"></i>
+					</div>
+					<div class="stat-label">今日评价用户</div>
+					<div class="stat-value">{$data['now_comment']}</div>
+					<div class="stat-footer">总评价数：<strong>{$data['total_comment']}</strong></div>
+				</div>
+			</div>
+		</div>
+

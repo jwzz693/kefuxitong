@@ -1,0 +1,442 @@
+/* =============================================
+   客服管理中心 - 现代化后台布局样式
+   ============================================= */
+
+/* --- 基础重置 --- */
+* { box-sizing: border-box; }
+html, body, .layui-layout { height: 100%; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+/* --- 过渡动画 --- */
+.pear-admin .layui-header,
+.pear-admin .layui-body,
+.pear-admin .layui-logo,
+.pear-admin .layui-side,
+.pear-admin .layui-header .layui-layout-left {
+	transition: all .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* --- 顶部导航栏 --- */
+.pear-admin .layui-header {
+	left: 260px;
+	width: calc(100% - 260px);
+	background: rgba(255,255,255,0.85);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-bottom: 1px solid rgba(0,0,0,0.06);
+	box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+	z-index: 998;
+}
+
+.pear-admin .layui-header .layui-nav {
+	background: transparent;
+}
+
+.pear-admin .layui-header .layui-nav .layui-nav-item > a {
+	color: #475569;
+	font-size: 15px;
+	transition: color .2s;
+}
+
+.pear-admin .layui-header .layui-nav .layui-nav-item > a:hover {
+	color: #6366f1;
+}
+
+.pear-admin .layui-header .layui-nav-img {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: 2px solid #e2e8f0;
+	transition: border-color .2s;
+}
+
+.pear-admin .layui-header .layui-nav-img:hover {
+	border-color: #6366f1;
+}
+
+.header-avatar { display: inline-block; vertical-align: middle; }
+.header-username {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 6px;
+	font-weight: 500;
+	color: #334155;
+}
+
+.pear-admin .layui-layout-right .layui-nav-child {
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	width: 170px;
+	box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+	overflow: hidden;
+	padding: 4px 0;
+}
+
+.pear-admin .layui-layout-right .layui-nav-child dd a {
+	color: #475569;
+	padding: 10px 20px;
+	transition: all .15s;
+}
+
+.pear-admin .layui-layout-right .layui-nav-child dd a:hover {
+	background: #f1f5f9;
+	color: #6366f1;
+}
+
+.pear-admin .layui-header .layui-nav .layui-nav-bar {
+	top: 0px !important;
+	height: 2px !important;
+	background-color: #6366f1;
+}
+
+.pear-admin .layui-header .layui-nav .layui-this:after { display: none; }
+.pear-admin .layui-header .layui-nav-more { display: none; }
+
+.pear-admin .layui-layout-control {
+	left: 140px;
+	position: absolute;
+}
+
+.pear-admin .layui-layout-control .layui-nav { padding: 0px; }
+
+/* --- 侧边栏 --- */
+.pear-admin .layui-side {
+	top: 0;
+	width: 260px;
+	background: linear-gradient(180deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
+	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+	z-index: 9999;
+	border-right: none;
+}
+
+.pear-admin .layui-logo {
+	width: 260px;
+	height: 64px;
+	line-height: 64px;
+	position: relative;
+	background: transparent;
+	border-bottom: 1px solid rgba(255,255,255,0.08);
+	display: flex;
+	align-items: center;
+	padding: 0 24px;
+}
+
+.pear-admin .layui-logo img.logo {
+	width: 36px;
+	height: 36px;
+	display: inline-block;
+	border-radius: 10px;
+	flex-shrink: 0;
+}
+
+.pear-admin .layui-logo .logo-title {
+	font-size: 17px;
+	font-weight: 600;
+	color: #fff;
+	margin-left: 12px;
+	letter-spacing: 0.5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pear-admin .layui-logo .title {
+	font-size: 17px;
+	color: #c7d2fe;
+	position: relative;
+	top: 0;
+	margin-left: 10px;
+}
+
+.pear-admin .layui-side-scroll::-webkit-scrollbar {
+	width: 4px;
+	height: 0;
+}
+
+.pear-admin .layui-side-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.pear-admin .layui-side-scroll::-webkit-scrollbar-thumb {
+	background: rgba(255,255,255,0.15);
+	border-radius: 4px;
+}
+
+.pear-admin .layui-side-scroll {
+	height: calc(100% - 64px - 48px) !important;
+	background: transparent;
+	width: 100%;
+	overflow-x: hidden;
+}
+
+/* 侧栏底部 */
+.sidebar-footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 48px;
+	line-height: 48px;
+	text-align: center;
+	border-top: 1px solid rgba(255,255,255,0.06);
+	background: rgba(0,0,0,0.1);
+}
+
+.sidebar-footer-text {
+	color: rgba(255,255,255,0.35);
+	font-size: 12px;
+	letter-spacing: 1px;
+}
+
+/* --- 内容区域 --- */
+.pear-admin .layui-body {
+	left: 260px;
+	bottom: 0;
+	padding-bottom: 0;
+	background: #f1f5f9;
+}
+
+.pear-admin .layui-layout-left { left: 0; }
+
+/* --- 折叠状态 --- */
+.pear-mini .layui-logo .logo-title,
+.pear-mini .layui-logo .title { display: none; }
+
+.pear-mini .layui-logo .logo { display: inline-block; }
+.pear-mini .layui-logo { width: 72px; padding: 0; justify-content: center; }
+
+.pear-mini .layui-side { width: 72px; }
+
+.pear-mini .layui-header {
+	left: 72px;
+	width: calc(100% - 72px);
+}
+
+.pear-mini .layui-body { left: 72px; }
+
+.pear-mini .layui-nav-tree .layui-nav-item span { display: none; }
+
+.pear-mini .bottom-nav li { width: 100% !important; }
+
+.pear-mini .layui-side-scroll { height: calc(100% - 64px - 48px); }
+
+.pear-mini .sidebar-footer-text { font-size: 0; }
+
+/* --- 移动端菜单按钮 --- */
+.pear-collasped-pe {
+	display: none;
+	width: 44px;
+	height: 44px;
+	line-height: 44px;
+	position: absolute;
+	z-index: 400000;
+	top: 74px;
+	right: 16px;
+	text-align: center;
+	border-radius: 12px;
+	background: #6366f1;
+	box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+
+.pear-collasped-pe a { color: white !important; }
+
+/* --- 响应式 --- */
+@media screen and (min-width: 768px) {
+	.layui-hide-sm { display: inline-block !important; }
+}
+
+@media screen and (min-width: 769px) {
+	.layui-hide-sm { display: none !important; }
+}
+
+@media screen and (max-width:768px) {
+	.collaspe { display: none !important; }
+	.pear-collasped-pe { display: inline-block !important; }
+	.layui-layout-control { left: 45px !important; }
+	.layui-layout-left { padding-left: 10px; padding-right: 10px; }
+
+	.pear-mini .bottom-nav { display: none; }
+	.pear-mini .layui-side-scroll { height: calc(100% - 64px - 48px); }
+
+	.pear-mini .layui-side { width: 0; }
+	.pear-mini .layui-header { left: 0; width: 100%; }
+	.pear-mini .layui-body { left: 0; }
+	.pear-mini .layui-logo { width: 0; overflow: hidden; }
+
+	.pear-admin .layui-body { left: 0; }
+	.pear-admin .layui-header { left: 0; width: 100%; }
+
+	.pear-admin .pear-cover {
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,0.5);
+		display: block;
+		position: absolute;
+		z-index: 1000;
+		opacity: 0;
+		margin-top: -64px;
+		backdrop-filter: blur(4px);
+	}
+
+	.pear-mini .pear-cover { display: none; }
+}
+
+/* --- Tab 动画 --- */
+@-webkit-keyframes am-horizontal-roll_show {
+	0% { opacity: 1; transform: translateX(2000px); }
+	100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes am-horizontal-roll_show {
+	0% { opacity: 1; transform: translateX(800px); }
+	100% { opacity: 1; transform: translateX(0); }
+}
+
+.layer-anim-right {
+	animation: am-horizontal-roll_show .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* --- 亮色侧边风格 --- */
+.light-theme .layui-logo {
+	background-color: white !important;
+	color: black !important;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.light-theme .layui-side-scroll {
+	background-color: white !important;
+	color: black !important;
+}
+
+.light-theme .layui-side {
+	background: #fff !important;
+	box-shadow: 2px 0 12px rgba(0, 0, 0, .06) !important;
+}
+
+.light-theme .sidebar-footer {
+	background: rgba(0,0,0,0.02);
+	border-top-color: #e2e8f0;
+}
+
+.light-theme .sidebar-footer-text { color: #94a3b8; }
+
+/* --- 主题选择界面 --- */
+.pearone-color .color-title {
+	padding: 15px 0 0px 20px;
+	margin-bottom: 4px;
+}
+
+.pearone-color .color-content {
+	padding: 15px 10px 0 20px;
+}
+
+.pearone-color .color-content ul {
+	list-style: none;
+	padding: 0;
+}
+
+.pearone-color .color-content ul li {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+	width: 70px;
+	height: 50px;
+	margin: 0 20px 20px 0;
+	padding: 2px;
+	background-color: #f1f5f9;
+	cursor: pointer;
+	font-size: 12px;
+	color: #64748b;
+	border-radius: 8px;
+	transition: transform .2s;
+}
+
+.pearone-color .color-content ul li:hover {
+	transform: translateY(-2px);
+}
+
+.pearone-color .color-content li.layui-this:after,
+.pearone-color .color-content li:hover:after {
+	width: 100%;
+	height: 100%;
+	padding: 4px;
+	top: -5px;
+	left: -5px;
+	border: #6366f1 2px solid;
+	opacity: 1;
+	border-radius: 10px;
+}
+
+.pearone-color .color-content li:after {
+	content: '';
+	position: absolute;
+	z-index: 20;
+	top: 50%;
+	left: 50%;
+	width: 1px;
+	height: 0;
+	border: 2px solid #F2F2F2;
+	transition: all .3s;
+	opacity: 0;
+}
+
+.select-color { margin-bottom: 30px; }
+.select-color .select-color-title { padding: 15px 0 0 20px; margin-bottom: 4px; }
+.select-color .select-color-content { padding: 20px 0 0 0; margin-bottom: 4px; }
+
+.select-color .select-color-content .select-color-item {
+	background-color: gray;
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	float: left;
+	margin-left: 20px;
+	color: white;
+	font-size: 18px;
+	text-align: center;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+	line-height: 32px;
+	transition: transform .2s;
+}
+
+.select-color .select-color-content .select-color-item:hover {
+	transform: scale(1.15);
+}
+
+/* --- 更多设置 --- */
+.more-setting { margin-top: 45px; }
+.more-setting form { margin-top: 30px; }
+.more-setting-title { padding: 15px 0 0 20px; margin-bottom: 4px; }
+.more-setting .layui-form-label { width: 60px; }
+
+.more-menu-list { width: 100%; margin-top: 80px; }
+
+.more-menu-item:first-child { border-top: 1px solid #e2e8f0; }
+
+.more-menu-item .layui-icon { font-size: 18px; padding-right: 10px; }
+
+.more-menu-item {
+	color: #475569;
+	height: 52px;
+	line-height: 52px;
+	font-size: 15px;
+	padding: 0 25px;
+	border-bottom: 1px solid #e2e8f0;
+	font-style: normal;
+	display: block;
+	transition: all .15s;
+}
+
+.more-menu-item:hover {
+	background-color: #f8fafc;
+	color: #6366f1;
+	padding-left: 30px;
+}
+
+.more-menu-item:after {
+	color: #94a3b8;
+	right: 16px;
+	content: "\e602";
+	position: absolute;
+	font-family: layui-icon !important;
+}

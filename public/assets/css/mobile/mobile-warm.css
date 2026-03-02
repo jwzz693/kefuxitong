@@ -1,0 +1,21 @@
+/* Mobile Warm Theme Override */
+:root {
+    --primary: #EA580C;
+    --primary-light: #FB923C;
+    --primary-dark: #C2410C;
+    --primary-glow: rgba(234,88,12,0.2);
+    --bg-page: #FFFBEB;
+    --bg-chat: #FFFFFF;
+    --bg-service: #FFF7ED;
+    --border-color: #FED7AA;
+    --border-light: #FFF7ED;
+}
+body { background: var(--bg-page) !important; }
+.header { background: linear-gradient(135deg, #9A3412 0%, #EA580C 50%, #FB923C 100%) !important; }
+.content { background-color: var(--bg-chat) !important; }
+.service { background-color: var(--bg-service) !important; border: 1px solid rgba(234,88,12,0.06) !important; }
+.customer { background: linear-gradient(135deg, #C2410C, #EA580C) !important; }
+.footer { border-top-color: var(--border-color) !important; }
+.lang-choose span:hover { background: linear-gradient(135deg, #C2410C, #EA580C) !important; color: #fff !important; }
+button.submit { background: linear-gradient(135deg, #C2410C, #EA580C) !important; }
+::-webkit-scrollbar-thumb { background-color: rgba(234,88,12,0.15) !important; }

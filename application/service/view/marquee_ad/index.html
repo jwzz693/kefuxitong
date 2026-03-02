@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+    <script src="/static/component/layui/layui.js"></script>
+    <script src="/static/component/pear/pear.js"></script>
+    <script type="text/javascript" src="__libs__/jquery/jquery.min.js?v=__lkversion__"></script>
+    <script src="__libs__/vue/vue.js?v=__lkversion__" type="text/javascript"></script>
+    <style>
+        .ad-list { margin-top: 15px; }
+        .ad-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .ad-item:hover { border-color: #4F46E5; box-shadow: 0 2px 8px rgba(79,70,229,0.1); }
+        .ad-item-info { flex: 1; min-width: 0; }
+        .ad-item-content { font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+        .ad-item-meta { font-size: 12px; color: #64748B; display: flex; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+        .ad-item-meta span { display: inline-flex; align-items: center; gap: 3px; }
+        .ad-item-preview {
+            width: 180px; height: 32px; border-radius: 16px; margin: 0 15px; overflow: hidden; position: relative; flex-shrink: 0;
+        }
+        .ad-item-preview .marquee-text {
+            position: absolute; white-space: nowrap; font-size: 12px; font-weight: 500; line-height: 32px; animation: marquee-scroll 6s linear infinite;
+        }
+        @keyframes marquee-scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ad-item-status { font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-right: 8px; }
+        .ad-item-status.on { background: #ECFDF5; color: #059669; }
+        .ad-item-status.off { background: #FEF2F2; color: #DC2626; }
+        .ad-item-global { font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-right: 8px; background: #EEF2FF; color: #4F46E5; }
+        .ad-item-sort { font-size: 12px; color: #94A3B8; margin-right: 10px; }
+        .ad-item-actions { display: flex; gap: 8px; align-items: center; }
+        .empty-tip { text-align: center; padding: 40px 0; color: #94A3B8; font-size: 14px; }
+
+        .ad-form { padding: 20px 30px; }
+        .ad-form .layui-form-item { margin-bottom: 15px; }
+        .ad-form .layui-form-label { width: 90px; }
+        .ad-form .layui-input-block { margin-left: 120px; }
+        .color-row { display: flex; gap: 10px; align-items: center; }
+        .color-row input[type="color"] { width: 40px; height: 32px; border: 1px solid #e9ecef; border-radius: 4px; cursor: pointer; padding: 2px; }
+        .preset-colors { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .preset-color {
+            width: 60px; height: 26px; border-radius: 13px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
+        }
+        .preset-color:hover, .preset-color.active { border-color: #1E293B; transform: scale(1.08); }
+    </style>
+</head>
+<body class="pear-container">
+<div class="layui-row layui-col-space10" id="container">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <span>流动广告管理</span>
+                <a class="pear-btn pear-btn-primary pear-btn-sm" @click="openAdd"><i class="layui-icon layui-icon-addition"></i> 添加广告</a>
+            </div>
+            <div class="layui-card-body">
+                <div style="padding:10px 0;color:#64748B;font-size:13px;border-bottom:1px dashed #e9ecef;margin-bottom:10px;">
+                    <i class="layui-icon layui-icon-about" style="color:#4F46E5;"></i>
+                    在客服工作台聊天工具栏点击"推送广告"按钮，即可将流动广告推送给正在聊天的访客。开启"全局显示"后，广告会自动展示给所有打开聊天窗口的访客。
+                </div>
+                <div v-if="list.length === 0" class="empty-tip">
+                    <i class="layui-icon layui-icon-face-smile" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
+                    暂无流动广告，请点击右上角添加
+                </div>
+                <div class="ad-list">
+                    <div class="ad-item" v-for="(item, index) in list" :key="item.id">
+                        <div class="ad-item-info">
+                            <div class="ad-item-content" :title="item.content">{{ item.content }}</div>
+                            <div class="ad-item-meta">
+                                <span v-if="item.link_url"><i class="layui-icon layui-icon-link" style="font-size:12px;color:#4F46E5;"></i> 有跳转链接</span>
+                                <span>速度：{{ item.speed }}s</span>
+                                <span>时长：{{ item.duration > 0 ? item.duration + 's' : '永久' }}</span>
+                                <span>轮播：{{ item.rotate_interval > 0 ? item.rotate_interval + 's' : '默认' }}</span>
+                            </div>
+                        </div>
+                        <div class="ad-item-preview" :style="{ background: item.bg_color }">
+                            <span class="marquee-text" :style="{ color: item.text_color }">{{ item.content }}</span>
+                        </div>
+                        <span class="ad-item-sort">排序：{{ item.sort }}</span>
+                        <span class="ad-item-global" v-if="item.is_global == 1">全局</span>
+                        <span class="ad-item-status" :class="item.status == 1 ? 'on' : 'off'">{{ item.status == 1 ? '启用' : '禁用' }}</span>
+                        <div class="ad-item-actions">
+                            <a class="pear-btn pear-btn-primary pear-btn-xs" @click="openEdit(item)"><i class="layui-icon layui-icon-edit"></i> 编辑</a>
+                            <a class="pear-btn pear-btn-danger pear-btn-xs" @click="removeItem(item)"><i class="layui-icon layui-icon-delete"></i> 删除</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var presetBgColors = [
+    { label: '紫蓝渐变', value: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)' },
+    { label: '橙红渐变', value: 'linear-gradient(90deg, #f093fb 0%, #f5576c 100%)' },
+    { label: '青绿渐变', value: 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)' },
+    { label: '金色渐变', value: 'linear-gradient(90deg, #f6d365 0%, #fda085 100%)' },
+    { label: '深色渐变', value: 'linear-gradient(90deg, #1a1a2e 0%, #16213e 100%)' },
+    { label: '红色', value: '#e74c3c' },
+    { label: '蓝色', value: '#3498db' },
+    { label: '绿色', value: '#27ae60' },
+];
+
+var app = new Vue({
+    el: '#container',
+    data() {
+        return {
+            list: []
+        };
+    },
+    created() {
+        this.loadList();
+    },
+    methods: {
+        loadList() {
+            var that = this;
+            $.ajax({
+                url: '/service/marquee_ad/index',
+                type: 'get',
+                success: function(res) {
+                    if (res.code === 0) {
+                        that.list = res.data || [];
+                    }
+                }
+            });
+        },
+        openAdd() {
+            var that = this;
+            var html = this.buildForm({});
+            layer.open({
+                type: 1,
+                title: '添加流动广告',
+                area: ['540px', '680px'],
+                content: html,
+                btn: ['保存', '取消'],
+                success: function(layero) {
+                    that.initFormEvents(layero);
+                },
+                yes: function(index, layero) {
+                    var data = that.getFormData(layero);
+                    if (!data.content) {
+                        layer.msg('请输入广告内容', {icon: 2});
+                        return;
+                    }
+                    $.ajax({
+                        url: '/service/marquee_ad/add',
+                        type: 'post',
+                        data: data,
+                        success: function(res) {
+                            if (res.code === 0) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.close(index);
+                                that.loadList();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                    });
+                }
+            });
+        },
+        openEdit(item) {
+            var that = this;
+            var html = this.buildForm(item);
+            layer.open({
+                type: 1,
+                title: '编辑流动广告',
+                area: ['540px', '680px'],
+                content: html,
+                btn: ['保存', '取消'],
+                success: function(layero) {
+                    that.initFormEvents(layero);
+                },
+                yes: function(index, layero) {
+                    var data = that.getFormData(layero);
+                    data.id = item.id;
+                    if (!data.content) {
+                        layer.msg('请输入广告内容', {icon: 2});
+                        return;
+                    }
+                    $.ajax({
+                        url: '/service/marquee_ad/edit',
+                        type: 'post',
+                        data: data,
+                        success: function(res) {
+                            if (res.code === 0) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.close(index);
+                                that.loadList();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                    });
+                }
+            });
+        },
+        removeItem(item) {
+            var that = this;
+            var contentShort = item.content.length > 20 ? item.content.substring(0, 20) + '...' : item.content;
+            layer.confirm('确定要删除广告 "' + contentShort + '" 吗？', {icon: 3, title: '提示'}, function(index) {
+                layer.close(index);
+                $.ajax({
+                    url: '/service/marquee_ad/remove',
+                    type: 'post',
+                    data: {id: item.id},
+                    success: function(res) {
+                        if (res.code === 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            that.loadList();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }
+                });
+            });
+        },
+        buildForm(item) {
+            var bgColor = item.bg_color || 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
+            var textColor = item.text_color || '#ffffff';
+            var statusChecked = (!item.id || item.status == 1) ? 'checked' : '';
+            var globalChecked = (item.is_global == 1) ? 'checked' : '';
+            var presetHtml = '';
+            for (var i = 0; i < presetBgColors.length; i++) {
+                var p = presetBgColors[i];
+                var isActive = (bgColor === p.value) ? ' active' : '';
+                presetHtml += '<div class="preset-color' + isActive + '" style="background:' + p.value + ';" data-value="' + p.value + '" title="' + p.label + '"></div>';
+            }
+            return '<div class="ad-form">' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">广告内容 <span style="color:red">*</span></label>' +
+                '  <div class="layui-input-block">' +
+                '    <textarea class="layui-textarea" id="ma_content" rows="3" placeholder="输入要滚动显示的广告文字">' + (item.content || '') + '</textarea>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">跳转链接</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="text" class="layui-input" id="ma_link" value="' + (item.link_url || '') + '" placeholder="可选，点击广告跳转的URL">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">背景样式</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="hidden" id="ma_bg_color" value="' + bgColor + '">' +
+                '    <div class="preset-colors">' + presetHtml + '</div>' +
+                '    <div style="margin-top:8px;font-size:12px;color:#94A3B8;">或自定义：<input type="text" id="ma_bg_custom" value="" placeholder="CSS颜色值或渐变" style="width:240px;height:28px;border:1px solid #e9ecef;border-radius:4px;padding:0 8px;font-size:12px;"></div>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">文字颜色</label>' +
+                '  <div class="layui-input-block">' +
+                '    <div class="color-row">' +
+                '      <input type="color" id="ma_text_color" value="' + textColor + '">' +
+                '      <span style="font-size:12px;color:#64748B;" id="ma_text_color_label">' + textColor + '</span>' +
+                '    </div>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">滚动速度</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="number" class="layui-input" id="ma_speed" value="' + (item.speed || 30) + '" placeholder="秒，越小越快" style="width:120px;">' +
+                '    <span style="font-size:12px;color:#94A3B8;margin-left:8px;">秒（一次滚动周期，越小越快）</span>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">显示时长</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="number" class="layui-input" id="ma_duration" value="' + (item.duration !== undefined ? item.duration : 30) + '" placeholder="秒，0为永久显示" style="width:120px;">' +
+                '    <span style="font-size:12px;color:#94A3B8;margin-left:8px;">秒（0 = 永久显示）</span>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">轮播间隔</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="number" class="layui-input" id="ma_rotate_interval" value="' + (item.rotate_interval !== undefined ? item.rotate_interval : 10) + '" placeholder="秒" style="width:120px;">' +
+                '    <span style="font-size:12px;color:#94A3B8;margin-left:8px;">秒（多条广告轮播时每条展示的时长）</span>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">排序</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="number" class="layui-input" id="ma_sort" value="' + (item.sort || 0) + '" placeholder="数字越大越靠前" style="width:120px;">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">状态</label>' +
+                '  <div class="layui-input-block" style="padding-top:8px;">' +
+                '    <input type="checkbox" id="ma_status" ' + statusChecked + ' lay-skin="switch" lay-text="启用|禁用">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">全局显示</label>' +
+                '  <div class="layui-input-block" style="padding-top:8px;">' +
+                '    <input type="checkbox" id="ma_is_global" ' + globalChecked + ' lay-skin="switch" lay-text="开启|关闭">' +
+                '    <div style="font-size:12px;color:#94A3B8;margin-top:5px;">开启后广告会自动展示给所有访客，无需手动推送</div>' +
+                '  </div>' +
+                '</div>' +
+                '</div>';
+        },
+        getFormData(layero) {
+            return {
+                content: $(layero).find('#ma_content').val(),
+                link_url: $(layero).find('#ma_link').val(),
+                bg_color: $(layero).find('#ma_bg_color').val(),
+                text_color: $(layero).find('#ma_text_color').val(),
+                speed: $(layero).find('#ma_speed').val() || 30,
+                duration: $(layero).find('#ma_duration').val(),
+                rotate_interval: $(layero).find('#ma_rotate_interval').val() || 10,
+                sort: $(layero).find('#ma_sort').val() || 0,
+                status: $(layero).find('#ma_status').is(':checked') ? 1 : 0,
+                is_global: $(layero).find('#ma_is_global').is(':checked') ? 1 : 0
+            };
+        },
+        initFormEvents(layero) {
+            // Preset color selection
+            $(layero).find('.preset-color').on('click', function() {
+                $(layero).find('.preset-color').removeClass('active');
+                $(this).addClass('active');
+                $(layero).find('#ma_bg_color').val($(this).data('value'));
+                $(layero).find('#ma_bg_custom').val('');
+            });
+            // Custom bg input
+            $(layero).find('#ma_bg_custom').on('input', function() {
+                var val = $(this).val().trim();
+                if (val) {
+                    $(layero).find('#ma_bg_color').val(val);
+                    $(layero).find('.preset-color').removeClass('active');
+                }
+            });
+            // Text color picker label
+            $(layero).find('#ma_text_color').on('input', function() {
+                $(layero).find('#ma_text_color_label').text($(this).val());
+            });
+        }
+    }
+});
+</script>
+</body>
+</html>

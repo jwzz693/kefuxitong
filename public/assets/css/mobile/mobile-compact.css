@@ -1,0 +1,19 @@
+/* Mobile Compact Green Theme Override */
+:root {
+    --primary: #059669;
+    --primary-light: #34D399;
+    --primary-dark: #047857;
+    --primary-glow: rgba(5,150,105,0.25);
+    --bg-page: #F0FDF4;
+    --bg-chat: #FFFFFF;
+    --bg-service: #ECFDF5;
+    --border-color: #D1FAE5;
+    --border-light: #ECFDF5;
+}
+body { background: var(--bg-page) !important; }
+.header { background: linear-gradient(135deg, #047857 0%, #059669 50%, #34D399 100%) !important; height: 48px !important; line-height: 48px !important; }
+.content { background-color: var(--bg-chat) !important; }
+.service { background-color: var(--bg-service) !important; padding: 9px 12px !important; font-size: 13px !important; }
+.customer { background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important; padding: 9px 12px !important; font-size: 13px !important; }
+.footer { border-top-color: var(--border-color) !important; }
+::-webkit-scrollbar-thumb { background-color: rgba(5,150,105,0.15) !important; }

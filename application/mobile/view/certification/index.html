@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+	    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<title>实名认证-在线客服系统-便宜的三方客服平台-网页客服系统-全渠道智能客服|智能客服系统</title>
+<meta name="keywords" content="网上客服系统,在线客服系统,智能客服,云客服系统,在线客服平台,IM客服软件,多渠道统一智能客服,全渠道客服系统">
+    <meta name="description" content="AI智能在线客服系统,支持网页、微信、微博、APP、邮件等全渠道覆盖接入。主动营销服务：专注线上转化。数据报表:种类繁多，细致全面，拥有300多种，为量化客服管理提供支持。30万+家企业用户正在使用AI智能客服提供的在线客服系统、智能客服、云客服系统、在线客服平台、IM客服软件、云客服平台、全渠道客服系统，AI智能客服为企业在线客服团队用户提速增效、优化服务体验。">
+    	<link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+    <link rel="stylesheet" href="__libs__/layui/css/layui.css?v=__lkversion__" />
+    <link rel="stylesheet" href="__assets__/mobile/css/layout.css?v=__lkversion__" />
+    <link rel="stylesheet" href="__assets__/mobile/css/reset.css?v=__lkversion__" />
+    <link rel="stylesheet" href="__assets__/mobile/css/animate.css?v=__lkversion__" />
+    <link rel="stylesheet" href="__assets__/mobile/css/swiper-3.4.1.min.css?v=__lkversion__" />
+		<script src="/static/js/cupload.js"></script>
+		<style>
+			.layui-form-label{
+            text-align: left;
+        }
+    </style>
+	</head>
+	<body>
+	       <div class="wc__headerBar fixed" routeUrl="{:url('mobile/admin/my')}">
+            <div class="inner flexbox" style="height: 30px;">
+                  <i class="layui-icon" style="position: absolute;left:10px;font-size: 20px;z-index: 999;color:#fff;" onclick="window.history.go(-1);"></i>
+            </div>
+        </div>
+		<form class="layui-row layui-col-space10 layui-form">
+			<div class="layui-col-md12">
+				<div class="layui-card" style="margin-left: 20px;margin-top: 20px;">
+				      {if $bussstatus == '0'}
+					<div class="layui-card-header" style="">尊敬的({$business['business_name']})用户,请提交您的实名信息！</div>
+               
+                     
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label" style="width:100px" >* 真实姓名:</label>
+						<div class="layui-input-block">
+							<input name="name" value="" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px" placeholder="请输入真实姓名" />
+
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label" style="width:100px" >* 年龄:</label>
+						<div class="layui-input-block">
+							<input name="age" value="" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px"  placeholder="请输入您的年龄"/>
+
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label" style="width:100px" >* 邮箱:</label>
+						<div class="layui-input-block">
+							<input name="maill" value="" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px" placeholder="请输入您的邮箱" />
+
+						</div>
+					</div>
+
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label" style="width:100px" >* 手机号:</label>
+						<div class="layui-input-block">
+							<input name="phone" value="" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px" placeholder="请输入11位手机号" />
+
+						</div>
+					</div>
+						<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label" style="width:100px" >* 支付宝/微信号:</label>
+						<div class="layui-input-block">
+							<input name="zfb" value="" class="layui-input" style="width: 250px;display: inline-block;margin-right: 10px" placeholder="请输入支付宝/微信号" />
+
+						</div>
+					</div>
+					
+
+                      <div class="layui-form-item">
+                <label class="layui-form-label" style="width:100px" >* 身份证正面:</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-3"></div>
+                </div>
+            </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label" style="width:100px" >* 身份证反面:</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-4"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width:100px" >* 营业执照:</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-5"></div>
+                </div>
+            </div>
+
+               <div class="layui-form-item">
+                <label class="layui-form-label" style="width:100px" >* 支付收款码:</label>
+                <div class="layui-input-inline">
+             		<div id="cupload-6"></div>
+                </div>
+            </div>
+           
+
+					<div class="layui-input-block" style="min-height: 80px;">
+						<button type="submit" class="pear-btn pear-btn-primary"  lay-submit="" lay-filter="save">提交审核</button>
+						<button type="reset" class="pear-btn">重置</button><br>
+						
+					</div>
+			
+				</div>
+			</div>
+		</form>
+   {/if}
+        {if $bussstatus == '1'}
+		<div class="layui-card-header">尊敬的({$business['business_name']})用户,您的实名信息于{$shenhetime}已提交审核...</div>
+	
+		   {/if}
+		       {if $bussstatus == '2'}
+		<div class="layui-card-header">尊敬的({$business['business_name']})用户,您的实名信息已审核通过!</div>
+	
+		   {/if}
+		<script src="/static/component/layui/layui.js"></script>
+		<script src="/static/component/pear/pear.js"></script>
+		<script type="text/javascript" src="__libs__/jquery/jquery.min.js"></script>
+		<script>
+			layui.use(['form', 'jquery'], function () {
+			        let form = layui.form;
+			        let $ = layui.jquery;
+			
+			        form.on('submit(save)', function (data) {
+			            $.ajax({
+			                data: JSON.stringify(data.field),
+			                dataType: 'json',
+			                contentType: 'application/json',
+			                type: 'post',
+			                success: function (res) {
+			                    if (res.code === 1) {
+			                        layer.msg(res.msg, {
+			                            icon: 1
+			                        }, function() {
+			                            location.reload();
+			                        });
+			                    } else {
+			                        layer.msg(res.msg, {icon: 2, time: 1500})
+			                    }
+			                }
+			            });
+			            return false;
+			        });
+			    });
+			var cupload3 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-3',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload4 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-4',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload5 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-5',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload6 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-6',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload7 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-7',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+		</script>
+	</body>
+</html>

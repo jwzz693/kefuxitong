@@ -1,0 +1,27 @@
+/* Mobile Dark Theme Override */
+:root {
+    --primary: #8B5CF6;
+    --primary-light: #A78BFA;
+    --primary-dark: #7C3AED;
+    --primary-glow: rgba(139,92,246,0.25);
+    --bg-page: #0F172A;
+    --bg-chat: #1E293B;
+    --bg-service: #334155;
+    --text-main: #F1F5F9;
+    --text-secondary: #CBD5E1;
+    --text-light: #64748B;
+    --border-color: #334155;
+    --border-light: #1E293B;
+}
+body { background: var(--bg-page) !important; color: var(--text-main); }
+.header { background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%) !important; }
+.content { background-color: var(--bg-chat) !important; }
+.service { background-color: var(--bg-service) !important; color: var(--text-main) !important; }
+.customer { background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important; }
+.footer { border-top-color: var(--border-color) !important; background-color: var(--bg-chat) !important; }
+.edit-ipt { color: var(--text-main) !important; }
+.dialog, .dialog1 { background-color: #1E293B !important; }
+.lang-choose span { background: var(--bg-service) !important; color: var(--text-secondary) !important; }
+.lang-choose span:hover { background: var(--primary) !important; color: #fff !important; }
+.offline-item input { background: var(--bg-service) !important; border-color: var(--border-color) !important; color: var(--text-main) !important; }
+::-webkit-scrollbar-thumb { background-color: rgba(139,92,246,0.2) !important; }

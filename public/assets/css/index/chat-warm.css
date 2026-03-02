@@ -1,0 +1,160 @@
+/* ============================
+   Chat UI - Warm Theme
+   Warm orange & amber cozy design
+   ============================ */
+
+:root {
+    --primary: #EA580C;
+    --primary-light: #FB923C;
+    --primary-dark: #C2410C;
+    --primary-glow: rgba(234,88,12,0.2);
+    --accent: #DC2626;
+    --accent-light: #F87171;
+    --bg-page: #FFFBEB;
+    --bg-chat: #FFFFFF;
+    --bg-service: #FFF7ED;
+    --bg-sidebar: #FFFBEB;
+    --text-main: #431407;
+    --text-secondary: #78350F;
+    --text-light: #A16207;
+    --text-white: #FFFFFF;
+    --border-color: #FED7AA;
+    --border-light: #FFF7ED;
+}
+
+body {
+    background: var(--bg-page) !important;
+}
+
+/* Header - Warm gradient */
+.header {
+    background: linear-gradient(135deg, #9A3412 0%, #EA580C 50%, #FB923C 100%) !important;
+    box-shadow: 0 2px 16px rgba(234,88,12,0.2) !important;
+}
+
+/* Chat content area */
+.content {
+    background-color: var(--bg-chat) !important;
+    background-image:
+        radial-gradient(ellipse at 10% 90%, rgba(234,88,12,0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 10%, rgba(245,158,11,0.02) 0%, transparent 50%) !important;
+}
+
+/* Service bubbles */
+.service {
+    background-color: var(--bg-service) !important;
+    color: var(--text-main) !important;
+    border: 1px solid rgba(234,88,12,0.06) !important;
+    box-shadow: 0 1px 3px rgba(234,88,12,0.05) !important;
+}
+
+/* Customer bubbles */
+.customer {
+    background: linear-gradient(135deg, #C2410C 0%, #EA580C 100%) !important;
+    box-shadow: 0 2px 10px var(--primary-glow) !important;
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid var(--border-color) !important;
+}
+
+/* Send button */
+.msg-toolbar-footer .msg-send-btn {
+    background: linear-gradient(135deg, #C2410C, #EA580C) !important;
+    box-shadow: 0 2px 8px var(--primary-glow) !important;
+}
+.msg-toolbar-footer .showinfo {
+    background: linear-gradient(135deg, #C2410C, #EA580C) !important;
+}
+
+/* Sidebar */
+#xxxx {
+    background: var(--bg-sidebar) !important;
+    border-left: 1px solid var(--border-color) !important;
+}
+
+/* Tabs */
+.layui-tab-brief > .layui-tab-title .layui-this {
+    color: var(--primary) !important;
+}
+.layui-tab-brief > .layui-tab-more li.layui-this:after,
+.layui-tab-brief > .layui-tab-title .layui-this:after {
+    border-bottom-color: var(--primary) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(234,88,12,0.15) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(234,88,12,0.3) !important;
+}
+
+/* Keywords */
+.keyword .swiper-slide {
+    color: var(--primary) !important;
+    border-color: rgba(234,88,12,0.25) !important;
+    background: rgba(234,88,12,0.05) !important;
+}
+.keyword .swiper-slide:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* Question list */
+#question_list div:hover {
+    color: var(--primary) !important;
+    background-color: rgba(234,88,12,0.05) !important;
+}
+
+/* Toolbar */
+.msg-toolbar a:hover {
+    background-color: rgba(234,88,12,0.06) !important;
+}
+
+/* Dialog */
+.lang-choose span:hover {
+    background: linear-gradient(135deg, #C2410C, #EA580C) !important;
+    color: #fff !important;
+}
+
+/* Evaluate */
+button.submit {
+    background: linear-gradient(135deg, #C2410C, #EA580C) !important;
+}
+
+/* Msg title */
+.msg-bg .title {
+    background: linear-gradient(135deg, #C2410C, #EA580C) !important;
+}
+
+/* Offline form */
+.offline-item input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(234,88,12,0.1) !important;
+}
+
+/* Links in conversation */
+.conversation li a {
+    color: var(--primary) !important;
+    text-decoration-color: rgba(234,88,12,0.3) !important;
+}
+.conversation li a:hover {
+    text-decoration-color: var(--primary) !important;
+}
+
+/* Time indicator */
+.showtime {
+    color: var(--text-light) !important;
+}
+.showtime::before,
+.showtime::after {
+    background: var(--border-color) !important;
+}
+
+/* Main container shadow */
+body > div:first-of-type:not(.bg):not(.offline):not(.lang-bg):not(.msg-bg):not(.musk):not(.map_box) {
+    box-shadow: 0 20px 60px -10px rgba(234,88,12,0.12), 0 8px 20px -6px rgba(0,0,0,0.04) !important;
+}

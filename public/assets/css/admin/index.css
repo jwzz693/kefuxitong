@@ -1,0 +1,602 @@
+/* ===== 客服工作台 - 全局重置与基础样式 ===== */
+:root {
+    --primary: #4F46E5;
+    --primary-light: #818CF8;
+    --primary-bg: #EEF2FF;
+    --accent: #06B6D4;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --bg-main: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F1F5F9;
+    --border-color: #E2E8F0;
+    --border-light: #F1F5F9;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    --transition: all 0.2s ease;
+}
+
+html, body, p, ul, li, img, h1, h2, h3, h4, pre {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+html, body, button, input, textarea, pre {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    overflow: hidden;
+    background: var(--bg-main);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4 { font-weight: 600; }
+ul { list-style: none; }
+a { text-decoration: none; color: var(--primary); }
+a:hover { color: var(--primary-light); }
+img { border: 0; vertical-align: middle; }
+textarea { overflow: auto; }
+embed { width: 100%; }
+
+pre {
+    border: 0;
+    background: 0;
+    white-space: pre-line;
+    word-break: keep-all;
+    font-family: inherit;
+}
+
+/* ===== 自定义滚动条 ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-track-piece { background: transparent; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ===== 容器 ===== */
+#container, .container { height: 100%; width: 100%; border: 0; overflow: hidden; }
+
+.all_content {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.no_chats {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/* 修复 layui tab 内容区高度（扣除52px标题栏） */
+.all_content .layui-tab-content {
+    height: calc(100% - 52px) !important;
+}
+
+.header {
+    height: 52px;
+    background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
+    color: #fff;
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== 聊天顶栏 ===== */
+.chatbox-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 56px;
+    width: 100%;
+    background: var(--bg-card);
+    z-index: 10;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chatbox-name .chatbox-info {
+    height: 56px;
+    width: 100%;
+    line-height: 56px;
+    padding-left: 24px;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-light);
+    letter-spacing: 0.3px;
+}
+
+/* ===== 对话列表 ===== */
+.conversation {
+    list-style: none;
+    padding: 76px 24px 24px;
+}
+
+/* ===== 底部输入区域 ===== */
+.footer {
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    height: 242px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+}
+
+.msg-input {
+    display: block;
+    padding: 16px 20px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    position: relative;
+}
+
+.input-box {
+    display: block;
+    width: 100%;
+    height: 90px;
+    overflow-y: auto;
+}
+
+/* ===== 发送按钮区域 ===== */
+.msg-toolbar-footer {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    height: 38px;
+    width: 128px;
+    display: flex;
+    align-items: center;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
+    box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.msg-toolbar-footer:hover {
+    box-shadow: 0 4px 12px rgba(79,70,229,0.4);
+    transform: translateY(-1px);
+}
+
+.msg-toolbar-footer .msg-send-btn {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 84px;
+    height: 38px;
+    text-align: center;
+    background: transparent;
+    line-height: 38px;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+
+.msg-toolbar-footer .showinfo {
+    position: absolute;
+    background: rgba(255,255,255,0.15);
+    right: 0;
+    top: 0;
+    width: 44px;
+    height: 38px;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.msg-toolbar-footer .showinfo svg,
+.msg-toolbar-footer .showinfo img {
+    height: 10px;
+    width: 10px;
+    display: block;
+    filter: brightness(10);
+}
+
+#chatmsg_submit {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.msg-toolbar-footer span {
+    display: block;
+    float: right;
+    height: 24px;
+    margin: 1px 8px 1px 0;
+    text-align: center;
+}
+
+/* ===== 工具栏 ===== */
+.msg-toolbar {
+    padding: 8px 20px;
+    height: 44px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    order: -1;
+}
+
+.msg-toolbar a {
+    height: 28px;
+    min-width: 28px;
+    cursor: pointer;
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    padding: 4px;
+    position: relative;
+    vertical-align: middle;
+    float: none;
+}
+
+.msg-toolbar a:hover {
+    background: var(--primary-bg);
+}
+
+.msg-toolbar a img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+    transition: var(--transition);
+    display: block;
+}
+
+.msg-toolbar a:hover img {
+    opacity: 1;
+}
+
+.msg-toolbar a svg {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    stroke: #64748B;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: var(--transition);
+    display: block;
+    flex-shrink: 0;
+}
+
+.msg-toolbar a:hover svg {
+    stroke: var(--primary);
+}
+
+/* 文件上传按钮内SVG对齐 */
+.msg-toolbar a form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.msg-toolbar .am-form-group {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.msg-toolbar .am-form-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.msg-toolbar .am-form-file svg {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    stroke: #64748B;
+    fill: none;
+    pointer-events: none;
+    display: block;
+    flex-shrink: 0;
+}
+
+.msg-toolbar .am-form-file:hover svg,
+.msg-toolbar a:hover .am-form-file svg {
+    stroke: var(--primary);
+}
+
+.msg-toolbar .am-form-file input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* 截图提示链接 */
+.msg-toolbar #paste {
+    position: absolute;
+    right: 20px;
+    bottom: auto;
+    width: auto;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    margin-right: 0;
+    padding: 4px 8px;
+}
+
+.msg-toolbar #paste svg {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    flex-shrink: 0;
+}
+
+.msg-toolbar #paste:hover {
+    color: var(--text-secondary);
+}
+
+/* ===== 消息气泡 ===== */
+.outer-right {
+    float: right;
+    max-width: 450px;
+    position: relative;
+    right: 56px;
+    top: 0;
+    clear: both;
+    font-size: 14px;
+}
+
+.outer-left {
+    float: left;
+    width: 500px;
+    position: relative;
+    left: 56px;
+    clear: both;
+    font-size: 14px;
+}
+
+.outer-iframe-left {
+    float: left;
+    position: relative;
+    clear: both;
+    padding-top: 5px;
+}
+
+.customer {
+    margin-right: 10px;
+    margin-top: 5px;
+    background: var(--bg-main);
+    display: inline-block;
+    padding: 12px 16px;
+    float: left;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: var(--text-primary);
+    border-radius: var(--radius-lg);
+    border-bottom-left-radius: 4px;
+    max-width: 90%;
+    box-sizing: border-box;
+    line-height: 1.6;
+    box-shadow: var(--shadow-sm);
+}
+
+.trans {
+    cursor: pointer;
+    color: #fff;
+    background: var(--primary-light);
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    margin-left: 5px;
+    font-size: 10px;
+    transition: var(--transition);
+}
+
+.trans:hover {
+    background: var(--primary);
+}
+
+.trans-data {
+    margin-top: 10px;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.service {
+    margin-left: 10px;
+    margin-top: 5px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
+    display: inline-block;
+    padding: 12px 16px;
+    float: right;
+    word-break: break-all;
+    word-wrap: break-word;
+    border-radius: var(--radius-lg);
+    border-bottom-right-radius: 4px;
+    position: relative;
+    max-width: 100%;
+    line-height: 1.6;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.2);
+}
+
+.service a { color: #fff !important; }
+.service pre { color: #fff; }
+
+.chatmsg {
+    margin-bottom: 20px;
+    position: relative;
+    height: auto;
+}
+
+.chatmsg:after, .chatmsg p {
+    content: "";
+    display: table;
+    clear: both;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.customer-name {
+    float: left;
+    display: block;
+    position: relative;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.showtime {
+    color: var(--text-muted);
+    position: relative;
+    margin-bottom: 12px;
+    font-size: 11px;
+    text-align: center;
+    height: 17px;
+}
+
+.outer-left img {
+    width: auto;
+    max-width: 200px;
+    max-height: 200px;
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+}
+
+.conversation li a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.triangle {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 8px solid #fff;
+}
+
+.hidden { visibility: hidden; }
+.hide { display: none; }
+
+.chatbox-name .group-list { height: 56px; }
+
+.chatbox-name .group-list .group-item {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 10px;
+    height: auto;
+    line-height: 20px;
+    color: var(--primary);
+    background: var(--primary-bg);
+    margin-top: 17px;
+    margin-left: 6px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+}
+
+.am-dropdown-toggle img {
+    height: 40px;
+    width: 40px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    margin: 0;
+    padding: 0;
+    box-shadow: var(--shadow-md);
+}
+
+.shujubiao { background-color: var(--bg-card) !important; }
+
+/* 支付方式卡片样式 */
+.payment-card-wrap {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 16px;
+    max-width: 320px;
+    margin: 4px 0;
+}
+.payment-card-item {
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+}
+.payment-card-item:last-child {
+    margin-bottom: 0;
+}
+.payment-card-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1E293B;
+    margin-bottom: 4px;
+}
+.payment-card-account {
+    font-size: 12px;
+    color: #64748B;
+    margin-bottom: 6px;
+    word-break: break-all;
+}
+.payment-card-qr {
+    text-align: center;
+    margin-top: 6px;
+}
+.payment-card-qr img {
+    max-width: 140px;
+    max-height: 140px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}

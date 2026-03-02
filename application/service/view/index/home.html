@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>商户主页</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+		<link rel="stylesheet" href="/static/admin/css/other/console1.css" />
+		<!-- 主 题 更 换 -->
+		<style id="pearadmin-bg-color"></style>
+		<style>
+			.layui-card-footer {
+				height: 42px;
+				line-height: 42px;
+				padding: 0 15px;
+				border-top: 1px solid #f6f6f6;
+				color: #666;
+				border-radius: 2px 2px 0 0;
+				font-size: 14px
+			}
+		</style>
+	</head>
+	<body class="pear-container">
+		<div>			
+			<div class="layui-row layui-col-space10">
+				<div class="layui-col-xs6 layui-col-md3">
+					<div class="layui-card ">
+						<div class="layui-card-header">当前咨询用户数</div>
+						<div class="layui-card-body">
+							<div class="layui-row layui-col-space5">
+								<div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #2d8cf0;background:#2d8cf0; color:#fff; text-align:center; border-radius: 10px;width:50%" id="value1"><i id="lang" class="layui-icon layui-icon-chat" style="font-size: 30px;font-weight: 500;cursor: pointer;color: #fff"></i>
+									{$talking}
+								</div>
+								<div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+							<!---<img src="/assets/images/index/zxzx.png" width="45" height="45">---->
+								</div>
+							</div>
+						</div>
+						<div class="layui-card-footer">
+							当前在线客服数：{$services}
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6 layui-col-md3">
+					<div class="layui-card">
+						<div class="layui-card-header">当前排队用户数</div>
+						<div class="layui-card-body">
+							<div class="layui-row layui-col-space5">
+								<div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;background:#f56c6c; color:#fff; text-align:center; border-radius: 10px;width:50%" id="value2"><i id="lang" class="layui-icon layui-icon-time" style="font-size: 30px;font-weight: 500;cursor: pointer;color: #fff"></i>
+									{$waiter}
+								</div>
+								<div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+								
+								</div>
+							</div>
+						</div>
+						<div class="layui-card-footer">
+							接待总用户数：{$getinall}
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6 layui-col-md3">
+					<div class="layui-card">
+						<div class="layui-card-header">今日聊天消息数</div>
+						<div class="layui-card-body">
+							<div class="layui-row layui-col-space5">
+								<div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;background:#5fb878; color:#fff; text-align:center; border-radius: 10px;width:50%" id="value3"><i id="lang" class="layui-icon layui-icon-dialogue" style="font-size: 30px;font-weight: 500;cursor: pointer;color: #fff"></i>
+								{$nowchats}
+								</div>
+								<div class="layui-col-xs4 layui-col-md4  top-panel-tips">
+							
+								</div>
+							</div>
+						</div>
+						<div class="layui-card-footer">
+							聊天消息总数：{$chatsall}
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs6 layui-col-md3">
+					<div class="layui-card">
+						<div class="layui-card-header">今日评价用户数</div>
+						<div class="layui-card-body">
+							<div class="layui-row layui-col-space5">
+								<div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;background:#e444dd; color:#fff; text-align:center; border-radius: 10px;width:50%" id="value4"><i id="lang" class="layui-icon layui-icon-release" style="font-size: 30px;font-weight: 500;cursor: pointer;color: #fff"></i>
+									{$nowcomments}
+								</div>
+								<div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+								
+								</div>
+							</div>
+						</div>
+						<div class="layui-card-footer">
+							总评价数：{$allcomments}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-row layui-col-space12">
+				<div class="layui-col-md12">
+					<div class="layui-card">
+						<div class="layui-card-body">
+							<div id="line2" style="min-height:400px;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--</div>-->
+		<script src="/static/component/layui/layui.js"></script>
+		<script src="/static/component/pear/pear.js"></script>
+		<script>
+            layui.use(['echarts'], function() {
+                let echarts = layui.echarts;
+                var line2 = echarts.init(document.getElementById('line2'));
+                const colorList = ["#9E87FF", '#73DDFF', '#fe9a8b', '#F56948', '#9E87FF']
+                option = {
+                    backgroundColor: '#fff',
+                    title: {
+                        text: '最近15天接待情况',
+                        textStyle: {
+                            fontSize: 12,
+                            fontWeight: 400
+                        },
+                        left: 'center',
+                        top: '5%'
+                    },
+                    legend: {
+                        icon: 'circle',
+                        top: '5%',
+                        right: '5%',
+                        itemWidth: 6,
+                        itemGap: 20,
+                        textStyle: {
+                            color: '#556677'
+                        }
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            label: {
+                                show: true,
+                                backgroundColor: '#fff',
+                                color: '#556677',
+                                borderColor: 'rgba(0,0,0,0)',
+                                shadowColor: 'rgba(0,0,0,0)',
+                                shadowOffsetY: 0
+                            },
+                            lineStyle: {
+                                width: 0
+                            }
+                        },
+                        backgroundColor: '#fff',
+                        textStyle: {
+                            color: '#5c6c7c'
+                        },
+                        padding: [10, 10],
+                        extraCssText: 'box-shadow: 1px 0 2px 0 rgba(163,163,163,0.5)'
+                    },
+                    grid: {
+                        top: '15%'
+                    },
+                    xAxis: [{
+                        type: 'category',
+                        data: {:json_encode(array_column($chatsdata,'date'))},
+                        axisLine: {
+                            lineStyle: {
+                                color: '#DCE2E8'
+                            }
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            interval: 0,
+                            textStyle: {
+                                color: '#556677'
+                            },
+                            // 默认x轴字体大小
+                            fontSize: 12,
+                            // margin:文字到x轴的距离
+                            margin: 15
+                        },
+                        axisPointer: {
+                            label: {
+                                // padding: [11, 5, 7],
+                                padding: [0, 0, 10, 0],
+                                // 这里的margin和axisLabel的margin要一致!
+                                margin: 15,
+                                // 移入时的字体大小
+                                fontSize: 12,
+                                backgroundColor: {
+                                    type: 'linear',
+                                    x: 0,
+                                    y: 0,
+                                    x2: 0,
+                                    y2: 1,
+                                    colorStops: [{
+                                        offset: 0,
+                                        color: '#fff' // 0% 处的颜色
+                                    }, {
+                                        // offset: 0.9,
+                                        offset: 0.86,
+                                        color: '#2fff' // 0% 处的颜色
+                                    }, {
+                                        offset: 0.86,
+                                        color: '#33c0cd' // 0% 处的颜色
+                                    }, {
+                                        offset: 1,
+                                        color: '#33c0cd' // 100% 处的颜色
+                                    }],
+                                    global: false // 缺省为 false
+                                }
+                            }
+                        },
+                        boundaryGap: false
+                    }],
+                    yAxis: [{
+                        type: 'value',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#DCE2E8'
+                            }
+                        },
+                        axisLabel: {
+                            textStyle: {
+                                color: '#556677'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }, {
+                        type: 'value',
+                        position: 'right',
+                        axisTick: {
+                            show: false
+                        },
+                        axisLabel: {
+                            textStyle: {
+                                color: '#556677'
+                            },
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#DCE2E8'
+                            }
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }],
+                    series: [{
+                        name: '会话总量',
+                        type: 'line',
+                        data: {:json_encode(array_column($chatsdata,'chat'))},
+                        symbolSize: 1,
+                        symbol: 'circle',
+                        smooth: true,
+                        yAxisIndex: 0,
+                        showSymbol: false,
+                        lineStyle: {
+                            width: 5,
+                            color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
+                                offset: 0,
+                                color: '#9effff'
+                            },
+                                {
+                                    offset: 1,
+                                    color: '#9E87FF'
+                                }
+                            ]),
+                            shadowColor: 'rgba(158,135,255, 0.3)',
+                            shadowBlur: 10,
+                            shadowOffsetY: 20
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: colorList[0],
+                                borderColor: colorList[0]
+                            }
+                        }
+                    }, {
+                        name: '接入会话总量',
+                        type: 'line',
+                        data: {:json_encode(array_column($chatsdata,'line'))},
+                        symbolSize: 1,
+                        symbol: 'circle',
+                        smooth: true,
+                        yAxisIndex: 0,
+                        showSymbol: false,
+                        lineStyle: {
+                            width: 5,
+                            color: new echarts.graphic.LinearGradient(1, 1, 0, 0, [{
+                                offset: 0,
+                                color: '#73DD39'
+                            },
+                                {
+                                    offset: 1,
+                                    color: '#73DDFF'
+                                }
+                            ]),
+                            shadowColor: 'rgba(115,221,255, 0.3)',
+                            shadowBlur: 10,
+                            shadowOffsetY: 20
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: colorList[1],
+                                borderColor: colorList[1]
+                            }
+                        }
+                    },
+                        {
+                            name: '评价人数',
+                            type: 'line',
+                            data: {:json_encode(array_column($chatsdata,'comment'))},
+                            symbolSize: 1,
+                            yAxisIndex: 1,
+                            symbol: 'circle',
+                            smooth: true,
+                            showSymbol: false,
+                            lineStyle: {
+                                width: 5,
+                                color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                                    offset: 0,
+                                    color: '#fe9a'
+                                },
+                                    {
+                                        offset: 1,
+                                        color: '#fe9a8b'
+                                    }
+                                ]),
+                                shadowColor: 'rgba(254,154,139, 0.3)',
+                                shadowBlur: 10,
+                                shadowOffsetY: 20
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: colorList[2],
+                                    borderColor: colorList[2]
+                                }
+                            }
+                        }
+                    ]
+                };
+                line2.setOption(option);
+                window.onresize = function() {
+                    line2.resize();
+                }
+            })
+		</script>
+	</body>
+</html>

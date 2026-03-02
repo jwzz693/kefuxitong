@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>客服管理中心</title>
+  <!-- 依赖脚本 -->
+  <script src="/static/component/layui/layui.js"></script>
+  <script src="/static/component/pear/pear.js"></script>
+  <!-- 依赖样式 -->
+  <link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+  <!-- 加载样式 -->
+  <link rel="stylesheet" href="/static/admin/css/load.css" />
+  <!-- 布局样式 -->
+  <link rel="stylesheet" href="/static/admin/css/admin.css" />
+  <script>
+    if (window != top) { top.location.href = location.href; }
+  </script>
+</head>
+
+<body class="layui-layout-body pear-admin">
+  <!-- 布局框架 -->
+  <div class="layui-layout layui-layout-admin">
+    <!-- 顶部导航 -->
+    <div class="layui-header">
+      <ul class="layui-nav layui-layout-left">
+        <li class="collaspe layui-nav-item"><a href="#" class="layui-icon layui-icon-shrink-right"></a></li>
+        <li class="refresh layui-nav-item"><a href="#" class="layui-icon layui-icon-refresh-1" loading=600></a></li>
+      </ul>
+      <div id="control" class="layui-layout-control"></div>
+      <ul class="layui-nav layui-layout-right" lay-filter="layui_nav_right">
+        <li class="layui-nav-item layui-hide-xs">
+          <a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a>
+        </li>
+        <li class="layui-nav-item layui-hide-xs">
+          <a href="{:url('index/index/welcome')}" class="layui-icon layui-icon-template-1"></a>
+        </li>
+        <li class="layui-nav-item user">
+          <a href="javascript:;">
+            <span class="header-avatar">
+              <img src="/assets/images/index/ai_service.png" class="layui-nav-img">
+            </span>
+            <span class="header-username">{$admin_name}</span>
+          </a>
+          <dl class="layui-nav-child">
+            <dd>
+              <a href="javascript:void(0);" class="password">
+                <i class="layui-icon layui-icon-password" style="margin-right:8px;"></i>修改密码
+              </a>
+            </dd>
+            <dd>
+              <a href="javascript:void(0);" class="cache">
+                <i class="layui-icon layui-icon-refresh" style="margin-right:8px;"></i>清理缓存
+              </a>
+            </dd>
+            <dd>
+              <a href="javascript:void(0);" class="logout">
+                <i class="layui-icon layui-icon-logout" style="margin-right:8px;"></i>退出登录
+              </a>
+            </dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+    <!-- 侧边栏 -->
+    <div class="layui-side layui-bg-black">
+      <div class="layui-logo">
+        <img class="logo" src="/static/admin/images/logo.png">
+        <div class="logo-title">客服管理中心</div>
+      </div>
+      <div class="layui-side-scroll">
+        <div id="sideMenu"></div>
+      </div>
+      <!-- 侧栏底部信息 -->
+      <div class="sidebar-footer">
+        <span class="sidebar-footer-text">V2.0</span>
+      </div>
+    </div>
+    <!-- 内容区域 -->
+    <div class="layui-body">
+      <div id="content"></div>
+    </div>
+  </div>
+  <!-- 遮盖层 -->
+  <div class="pear-cover"></div>
+  <!-- 移动端菜单按钮 -->
+  <div class="pear-collasped-pe collaspe"><a href="#" class="layui-icon layui-icon-shrink-right"></a></div>
+  <!-- 加载动画 -->
+  <div class="loader-main">
+    <div class="loader-content">
+      <div class="loader-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loader-text">正在加载...</p>
+    </div>
+  </div>
+  <!-- 框架初始化 -->
+  <script>
+    layui.use(['admin', 'jquery', 'layer', 'element'], function () {
+      var $ = layui.jquery;
+      var layer = layui.layer;
+      var layelem = layui.element;
+      var admin = layui.admin;
+      admin.render({
+        "logo": {
+          "title": "客服管理中心",
+          "image": "/static/admin/images/logo.png"
+        },
+        "menu": {
+          "data": "{:url('backend/index/menu')}",
+          "accordion": true,
+          "control": false,
+          "select": "0"
+        },
+        "tab": {
+          "muiltTab": true,
+          "keepState": true,
+          "session": true,
+          "tabMax": 30,
+          "index": {
+            "id": "0",
+            "href": "{:url('backend/index/home')}",
+            "title": "首页"
+          }
+        },
+        "theme": {
+          "defaultColor": "1",
+          "defaultMenu": "dark-theme",
+          "allowCustom": true
+        },
+        "colors": [{
+          "id": "1",
+          "color": "#6366f1"
+        },
+        {
+          "id": "2",
+          "color": "#3b82f6"
+        },
+        {
+          "id": "3",
+          "color": "#10b981"
+        }, {
+          "id": "4",
+          "color": "#f59e0b"
+        }, {
+          "id": "5",
+          "color": "#8b5cf6"
+        }
+        ],
+        "other": {
+          "keepLoad": 100
+        },
+        "header": {
+          message: false
+        }
+      });
+      layelem.on('nav(layui_nav_right)', function (elem) {
+        if ($(elem).hasClass('logout')) {
+          layer.confirm('确定退出登录吗?', {
+            btn: ['确定', '取消'],
+            title: '提示',
+            icon: 3,
+            skin: 'layui-layer-molv'
+          }, function (index) {
+            layer.close(index);
+            $.ajax({
+              url: "{:url('backend/login/logout')}",
+              type: "POST",
+              dataType: "json",
+              success: function (res) {
+                if (res.code == 1) {
+                  layer.msg(res.msg, { icon: 1 });
+                  setTimeout(function () {
+                    location.href = "{:url('backend/login/index')}";
+                  }, 333)
+                }
+              }
+            });
+          });
+        } else if ($(elem).hasClass('password')) {
+          layer.open({
+            type: 2,
+            maxmin: false,
+            title: '修改密码',
+            shade: 0.3,
+            area: ['420px', '320px'],
+            content: "{:url('backend/index/pass')}",
+            skin: 'layui-layer-molv'
+          });
+        } else if ($(elem).hasClass('cache')) {
+          var loadIdx = layer.load(2, { shade: [0.2, '#000'] });
+          $.post("{:url('backend/index/cash')}", function (data) {
+            layer.close(loadIdx);
+            layer.msg(data.msg, { time: 2000, icon: 1 });
+            setTimeout(function(){ location.reload(); }, 1500);
+          });
+        }
+      });
+    })
+  </script>
+</body>
+
+</html>

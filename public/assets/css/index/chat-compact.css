@@ -1,0 +1,200 @@
+/* ============================
+   Chat UI - Compact Green Theme
+   Fresh & compact design
+   ============================ */
+
+:root {
+    --primary: #059669;
+    --primary-light: #34D399;
+    --primary-dark: #047857;
+    --primary-glow: rgba(5,150,105,0.25);
+    --accent: #F59E0B;
+    --accent-light: #FBBF24;
+    --bg-page: #F0FDF4;
+    --bg-chat: #FFFFFF;
+    --bg-service: #ECFDF5;
+    --bg-sidebar: #F0FDF4;
+    --text-main: #1E293B;
+    --text-secondary: #475569;
+    --text-light: #94A3B8;
+    --text-white: #FFFFFF;
+    --border-color: #D1FAE5;
+    --border-light: #ECFDF5;
+}
+
+body {
+    background: var(--bg-page) !important;
+}
+
+/* Header - Compact */
+.header {
+    height: 52px !important;
+    line-height: 52px !important;
+    background: linear-gradient(135deg, #047857 0%, #059669 50%, #34D399 100%) !important;
+    box-shadow: 0 2px 12px rgba(5,150,105,0.2) !important;
+    font-size: 14px !important;
+}
+
+/* Chat area */
+.content {
+    background-color: var(--bg-chat) !important;
+    background-image:
+        radial-gradient(ellipse at 10% 90%, rgba(5,150,105,0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 10%, rgba(245,158,11,0.02) 0%, transparent 50%) !important;
+}
+
+/* Service bubbles - compact */
+.service {
+    background-color: var(--bg-service) !important;
+    color: var(--text-main) !important;
+    padding: 9px 14px !important;
+    border-radius: 14px !important;
+    border-bottom-left-radius: 4px !important;
+    font-size: 13px !important;
+    box-shadow: 0 1px 3px rgba(5,150,105,0.06) !important;
+}
+
+/* Customer bubbles - compact */
+.customer {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    padding: 9px 14px !important;
+    border-radius: 14px !important;
+    border-bottom-right-radius: 4px !important;
+    font-size: 13px !important;
+    box-shadow: 0 2px 8px var(--primary-glow) !important;
+}
+
+/* Avatar - smaller */
+.my-circle {
+    width: 40px !important;
+    height: 40px !important;
+    border-width: 1.5px !important;
+}
+
+/* Message spacing - compact */
+.chatmsg, .chatmsg_no {
+    margin-bottom: 16px !important;
+}
+
+.conversation {
+    padding-top: 20px !important;
+}
+
+/* Footer - compact */
+.footer {
+    height: 160px !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+.msg-input {
+    margin: 10px 18px 6px !important;
+    height: 90px !important;
+}
+
+/* Toolbar - compact */
+.msg-toolbar {
+    bottom: 24px !important;
+    left: 16px !important;
+}
+.msg-toolbar a {
+    margin-right: 12px !important;
+}
+
+.msg-toolbar-footer {
+    bottom: 12px !important;
+    right: 16px !important;
+    height: 36px !important;
+}
+.msg-toolbar-footer .msg-send-btn {
+    width: 72px !important;
+    font-size: 13px !important;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    box-shadow: 0 2px 6px var(--primary-glow) !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+}
+.msg-toolbar-footer .showinfo {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    height: 36px !important;
+    width: 40px !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+}
+
+/* Sidebar */
+#xxxx {
+    background: var(--bg-sidebar) !important;
+    border-left: 1px solid var(--border-color) !important;
+}
+
+/* Tabs */
+.layui-tab-brief > .layui-tab-title .layui-this {
+    color: var(--primary) !important;
+}
+.layui-tab-brief > .layui-tab-more li.layui-this:after,
+.layui-tab-brief > .layui-tab-title .layui-this:after {
+    border-bottom-color: var(--primary) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(5,150,105,0.15) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(5,150,105,0.3) !important;
+}
+
+/* Send button */
+.msg-toolbar-footer .msg-send-btn {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+}
+
+/* Keywords */
+.keyword .swiper-slide {
+    color: var(--primary) !important;
+    border-color: rgba(5,150,105,0.3) !important;
+    background: rgba(5,150,105,0.06) !important;
+    font-size: 11px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    padding: 0 12px !important;
+}
+.keyword .swiper-slide:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* Question list */
+#question_list div:hover {
+    color: var(--primary) !important;
+    background-color: rgba(5,150,105,0.06) !important;
+}
+
+/* Dialog */
+.lang-choose span:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+
+/* Time indicator */
+.showtime {
+    font-size: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/* Emoji tool box */
+.tool_box {
+    bottom: 140px !important;
+}
+
+/* Content area adjustment for compact header */
+.content {
+    bottom: 160px !important;
+}
+
+/* Main container */
+body > div:first-of-type:not(.bg):not(.offline):not(.lang-bg):not(.msg-bg):not(.musk):not(.map_box) {
+    box-shadow: 0 16px 48px -10px rgba(5,150,105,0.15), 0 6px 16px -6px rgba(0,0,0,0.04) !important;
+    border-radius: 14px !important;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{$visitername}的聊天记录</title>
+    <style type="text/css">
+        .send {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .event {
+            padding: 1px 0 2px 10px;
+            color: #333;
+            font-size: 13px;
+            font-family: Georgia;
+        }
+
+        .message {
+            padding: 2px 0 2px 10px;
+        }
+
+        .message p {
+            margin: 0;
+        }
+
+        .image img {
+            max-width: 60%;
+            padding: 2px 0px 2px 10px;
+        }
+
+        hr {
+            border-color: #ececec;
+        }
+    </style>
+</head>
+
+<body>
+    <h3 style='text-align: center;margin: 5px auto;'>{$visitername}的聊天记录</h3>
+    <hr>
+    		    {foreach $list as $key=>$vo } 
+		    	{if strtoupper($vo['direction']) == 'to_visiter' }
+		    	 <div class="send">{$vo.name}&nbsp;&nbsp;{$vo.infotime}</div>
+				    <div class="message"
+				        style="font-size:13px;font-weight:normal;font-style:normal;text-decoration:none;color:#000;line-height:1.4;">{$vo.content}
+				    </div>
+		    	
+		    	{else /} 
+		    	    <div class="send">{$vo.name}&nbsp;&nbsp;{$vo.infotime}</div>
+    				<div class="message">{$vo.content}</div>	  
+		    	{/if}
+		
+			{/foreach}
+
+</body>
+
+</html>

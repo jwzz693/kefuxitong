@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+    <script src="/static/component/layui/layui.js"></script>
+    <script src="/static/component/pear/pear.js"></script>
+    <script type="text/javascript" src="__libs__/jquery/jquery.min.js?v=__lkversion__"></script>
+    <script src="__libs__/vue/vue.js?v=__lkversion__" type="text/javascript"></script>
+    <style>
+        .payment-list { margin-top: 15px; }
+        .payment-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .payment-item:hover { border-color: #4F46E5; box-shadow: 0 2px 8px rgba(79,70,229,0.1); }
+        .payment-item-info { flex: 1; }
+        .payment-item-name { font-size: 15px; font-weight: 600; color: #1E293B; margin-bottom: 4px; }
+        .payment-item-account { font-size: 13px; color: #64748B; }
+        .payment-item-qr { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; margin: 0 15px; cursor: pointer; border: 1px solid #e9ecef; }
+        .payment-item-actions { display: flex; gap: 8px; align-items: center; }
+        .payment-item-status { font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-right: 8px; }
+        .payment-item-status.on { background: #ECFDF5; color: #059669; }
+        .payment-item-status.off { background: #FEF2F2; color: #DC2626; }
+        .payment-item-sort { font-size: 12px; color: #94A3B8; margin-right: 10px; }
+        .payment-item-link { font-size: 12px; color: #4F46E5; margin-top: 2px; word-break: break-all; }
+        .payment-item-link a { color: #4F46E5; text-decoration: underline; }
+        .empty-tip { text-align: center; padding: 40px 0; color: #94A3B8; font-size: 14px; }
+
+        /* 表单弹窗样式 */
+        .payment-form { padding: 20px 30px; }
+        .payment-form .layui-form-item { margin-bottom: 15px; }
+        .payment-form .layui-form-label { width: 90px; }
+        .payment-form .layui-input-block { margin-left: 120px; }
+        .qrcode-preview { max-width: 120px; max-height: 120px; border-radius: 6px; margin-top: 8px; display: none; border: 1px solid #e9ecef; }
+        .upload-btn { display: inline-block; padding: 0 15px; height: 32px; line-height: 32px; background: #4F46E5; color: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .upload-btn:hover { background: #4338CA; }
+    </style>
+</head>
+<body class="pear-container">
+<div class="layui-row layui-col-space10" id="container">
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <span>支付方式管理</span>
+                <a class="pear-btn pear-btn-primary pear-btn-sm" @click="openAdd"><i class="layui-icon layui-icon-addition"></i> 添加支付方式</a>
+            </div>
+            <div class="layui-card-body">
+                <div v-if="list.length === 0" class="empty-tip">
+                    <i class="layui-icon layui-icon-face-smile" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
+                    暂无支付方式，请点击右上角添加
+                </div>
+                <div class="payment-list">
+                    <div class="payment-item" v-for="(item, index) in list" :key="item.id">
+                        <div class="payment-item-info">
+                            <div class="payment-item-name">{{ item.method_name }}</div>
+                            <div class="payment-item-account" v-if="item.account_info">账号：{{ item.account_info }}</div>
+                            <div class="payment-item-link" v-if="item.payment_link"><i class="layui-icon layui-icon-link" style="font-size:12px;"></i> <a :href="item.payment_link" target="_blank">{{ item.payment_link }}</a></div>
+                        </div>
+                        <img v-if="item.qrcode_url" :src="item.qrcode_url" class="payment-item-qr" @click="previewQr(item.qrcode_url)" title="点击预览">
+                        <div style="width:50px;height:50px;margin:0 15px;" v-else></div>
+                        <span class="payment-item-sort">排序：{{ item.sort }}</span>
+                        <span class="payment-item-status" :class="item.status == 1 ? 'on' : 'off'">{{ item.status == 1 ? '启用' : '禁用' }}</span>
+                        <div class="payment-item-actions">
+                            <a class="pear-btn pear-btn-primary pear-btn-xs" @click="openEdit(item)"><i class="layui-icon layui-icon-edit"></i> 编辑</a>
+                            <a class="pear-btn pear-btn-danger pear-btn-xs" @click="removeItem(item)"><i class="layui-icon layui-icon-delete"></i> 删除</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var app = new Vue({
+    el: '#container',
+    data() {
+        return {
+            list: []
+        };
+    },
+    created() {
+        this.loadList();
+    },
+    methods: {
+        loadList() {
+            var that = this;
+            $.ajax({
+                url: '/service/payment/index',
+                type: 'get',
+                success: function(res) {
+                    if (res.code === 0) {
+                        that.list = res.data || [];
+                    }
+                }
+            });
+        },
+        openAdd() {
+            var that = this;
+            var html = this.buildForm({});
+            layer.open({
+                type: 1,
+                title: '添加支付方式',
+                area: ['500px', '560px'],
+                content: html,
+                btn: ['保存', '取消'],
+                success: function(layero) {
+                    that.initUpload(layero);
+                },
+                yes: function(index, layero) {
+                    var data = that.getFormData(layero);
+                    if (!data.method_name) {
+                        layer.msg('请输入支付方式名称', {icon: 2});
+                        return;
+                    }
+                    $.ajax({
+                        url: '/service/payment/add',
+                        type: 'post',
+                        data: data,
+                        success: function(res) {
+                            if (res.code === 0) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.close(index);
+                                that.loadList();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                    });
+                }
+            });
+        },
+        openEdit(item) {
+            var that = this;
+            var html = this.buildForm(item);
+            layer.open({
+                type: 1,
+                title: '编辑支付方式',
+                area: ['500px', '560px'],
+                content: html,
+                btn: ['保存', '取消'],
+                success: function(layero) {
+                    that.initUpload(layero);
+                },
+                yes: function(index, layero) {
+                    var data = that.getFormData(layero);
+                    data.id = item.id;
+                    if (!data.method_name) {
+                        layer.msg('请输入支付方式名称', {icon: 2});
+                        return;
+                    }
+                    $.ajax({
+                        url: '/service/payment/edit',
+                        type: 'post',
+                        data: data,
+                        success: function(res) {
+                            if (res.code === 0) {
+                                layer.msg(res.msg, {icon: 1});
+                                layer.close(index);
+                                that.loadList();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                    });
+                }
+            });
+        },
+        removeItem(item) {
+            var that = this;
+            layer.confirm('确定要删除 "' + item.method_name + '" 吗？', {icon: 3, title: '提示'}, function(index) {
+                layer.close(index);
+                $.ajax({
+                    url: '/service/payment/remove',
+                    type: 'post',
+                    data: {id: item.id},
+                    success: function(res) {
+                        if (res.code === 0) {
+                            layer.msg(res.msg, {icon: 1});
+                            that.loadList();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }
+                });
+            });
+        },
+        previewQr(url) {
+            layer.open({
+                type: 1,
+                title: '收款码预览',
+                area: ['350px', '380px'],
+                content: '<div style="text-align:center;padding:20px;"><img src="' + url + '" style="max-width:300px;max-height:300px;border-radius:8px;"></div>'
+            });
+        },
+        buildForm(item) {
+            var qrShow = item.qrcode_url ? 'display:block;' : 'display:none;';
+            var qrSrc = item.qrcode_url || '';
+            var statusChecked = (!item.id || item.status == 1) ? 'checked' : '';
+            return '<div class="payment-form">' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">名称 <span style="color:red">*</span></label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="text" class="layui-input" id="pm_name" value="' + (item.method_name || '') + '" placeholder="如：支付宝、微信、银行卡">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">收款账号</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="text" class="layui-input" id="pm_account" value="' + (item.account_info || '') + '" placeholder="可选，如：138xxxx1234">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">收款码</label>' +
+                '  <div class="layui-input-block">' +
+                '    <span class="upload-btn" id="pm_upload_btn"><i class="layui-icon layui-icon-upload"></i> 上传图片</span>' +
+                '    <input type="hidden" id="pm_qrcode" value="' + qrSrc + '">' +
+                '    <br><img id="pm_qrcode_preview" src="' + qrSrc + '" class="qrcode-preview" style="' + qrShow + '">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">跳转链接</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="text" class="layui-input" id="pm_link" value="' + (item.payment_link || '') + '" placeholder="可选，如：https://... 或 alipays://...">' +
+                '    <div style="font-size:11px;color:#94A3B8;margin-top:4px;">支持网页链接(http/https)或APP协议链接(alipays://、weixin://)</div>' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">排序</label>' +
+                '  <div class="layui-input-block">' +
+                '    <input type="number" class="layui-input" id="pm_sort" value="' + (item.sort || 0) + '" placeholder="数字越大越靠前" style="width:120px;">' +
+                '  </div>' +
+                '</div>' +
+                '<div class="layui-form-item">' +
+                '  <label class="layui-form-label">状态</label>' +
+                '  <div class="layui-input-block" style="padding-top:8px;">' +
+                '    <input type="checkbox" id="pm_status" ' + statusChecked + ' lay-skin="switch" lay-text="启用|禁用">' +
+                '  </div>' +
+                '</div>' +
+                '</div>';
+        },
+        getFormData(layero) {
+            return {
+                method_name: $(layero).find('#pm_name').val(),
+                account_info: $(layero).find('#pm_account').val(),
+                qrcode_url: $(layero).find('#pm_qrcode').val(),
+                payment_link: $(layero).find('#pm_link').val(),
+                sort: $(layero).find('#pm_sort').val() || 0,
+                status: $(layero).find('#pm_status').is(':checked') ? 1 : 0
+            };
+        },
+        initUpload(layero) {
+            layui.use('upload', function(){
+                var upload = layui.upload;
+                upload.render({
+                    elem: $(layero).find('#pm_upload_btn')[0],
+                    url: '/service/payment/uploadQrcode',
+                    accept: 'images',
+                    done: function(res) {
+                        if (res.code === 1) {
+                            $(layero).find('#pm_qrcode').val(res.data);
+                            $(layero).find('#pm_qrcode_preview').attr('src', res.data).show();
+                            layer.msg('上传成功', {icon: 1, time: 1000});
+                        } else {
+                            layer.msg(res.msg || '上传失败', {icon: 2});
+                        }
+                    }
+                });
+            });
+        }
+    }
+});
+</script>
+</body>
+</html>

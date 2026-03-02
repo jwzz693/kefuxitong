@@ -1,0 +1,22 @@
+/* Mobile Business Theme Override */
+:root {
+    --primary: #4F46E5;
+    --primary-light: #818CF8;
+    --primary-dark: #4338CA;
+    --primary-glow: rgba(79,70,229,0.2);
+    --bg-page: #F5F3FF;
+    --bg-chat: #FFFFFF;
+    --bg-service: #EEF2FF;
+    --text-main: #1E1B4B;
+    --border-color: #E0E7FF;
+    --border-light: #EEF2FF;
+}
+body { background: var(--bg-page) !important; }
+.header { background: linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4338CA 100%) !important; }
+.content { background-color: var(--bg-chat) !important; }
+.service { background-color: var(--bg-service) !important; border: 1px solid rgba(99,102,241,0.08) !important; }
+.customer { background: linear-gradient(135deg, #4338CA, #6366F1) !important; }
+.footer { border-top-color: var(--border-color) !important; }
+.lang-choose span:hover { background: linear-gradient(135deg, #4338CA, #6366F1) !important; color: #fff !important; }
+button.submit { background: linear-gradient(135deg, #4338CA, #6366F1) !important; }
+::-webkit-scrollbar-thumb { background-color: rgba(99,102,241,0.15) !important; }

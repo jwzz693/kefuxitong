@@ -1,0 +1,234 @@
+/* ============================
+   Chat UI - Dark Theme
+   Elegant dark mode design
+   ============================ */
+
+:root {
+    --primary: #8B5CF6;
+    --primary-light: #A78BFA;
+    --primary-dark: #7C3AED;
+    --primary-glow: rgba(139,92,246,0.25);
+    --accent: #F472B6;
+    --accent-light: #F9A8D4;
+    --bg-page: #0F172A;
+    --bg-chat: #1E293B;
+    --bg-service: #334155;
+    --bg-sidebar: #0F172A;
+    --text-main: #F1F5F9;
+    --text-secondary: #CBD5E1;
+    --text-light: #64748B;
+    --text-white: #FFFFFF;
+    --border-color: #334155;
+    --border-light: #1E293B;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-md: 0 4px 8px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.2);
+    --shadow-lg: 0 10px 30px -4px rgba(0,0,0,0.4), 0 4px 8px -4px rgba(0,0,0,0.2);
+    --shadow-xl: 0 20px 50px -6px rgba(0,0,0,0.4), 0 8px 12px -6px rgba(0,0,0,0.2);
+}
+
+body {
+    background: var(--bg-page) !important;
+    color: var(--text-main);
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #4338CA 100%) !important;
+    box-shadow: 0 2px 16px rgba(99,102,241,0.2) !important;
+}
+
+/* Chat area */
+.content {
+    background-color: var(--bg-chat) !important;
+    background-image:
+        radial-gradient(ellipse at 10% 90%, rgba(139,92,246,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 10%, rgba(244,114,182,0.03) 0%, transparent 50%) !important;
+}
+
+/* Service bubbles */
+.service {
+    background-color: var(--bg-service) !important;
+    color: var(--text-main) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* Customer bubbles */
+.customer {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    box-shadow: 0 2px 10px var(--primary-glow) !important;
+}
+
+/* Footer / Input area */
+.footer {
+    border-top: 1px solid var(--border-color) !important;
+    background-color: var(--bg-chat) !important;
+}
+
+.edit-ipt {
+    color: var(--text-main) !important;
+}
+
+/* Sidebar */
+#xxxx {
+    background: var(--bg-sidebar) !important;
+    border-left: 1px solid var(--border-color) !important;
+}
+
+/* Tabs */
+.layui-tab-brief > .layui-tab-title .layui-this {
+    color: var(--primary-light) !important;
+    background-color: var(--bg-chat) !important;
+}
+.layui-tab-brief > .layui-tab-title li {
+    color: var(--text-secondary);
+}
+.layui-tab-brief > .layui-tab-more li.layui-this:after,
+.layui-tab-brief > .layui-tab-title .layui-this:after {
+    border-bottom-color: var(--primary-light) !important;
+}
+.layui-tab-content {
+    color: var(--text-secondary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(139,92,246,0.2) !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(139,92,246,0.4) !important;
+}
+
+/* Toolbar */
+.msg-toolbar a {
+    opacity: 0.6 !important;
+}
+.msg-toolbar a:hover {
+    opacity: 1 !important;
+    background-color: rgba(139,92,246,0.1) !important;
+}
+.msg-toolbar a svg {
+    stroke: var(--text-secondary);
+}
+
+/* Send button */
+.msg-toolbar-footer .msg-send-btn {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+    box-shadow: 0 2px 8px var(--primary-glow) !important;
+}
+.msg-toolbar-footer .showinfo {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+}
+
+/* Emoji box */
+.tool_box {
+    background-color: var(--bg-chat) !important;
+    border: 1px solid var(--border-color) !important;
+}
+.wl_faces_main ul {
+    border-color: var(--border-color) !important;
+}
+.wl_faces_main ul li {
+    border-color: var(--border-color) !important;
+}
+.wl_faces_main ul li:hover {
+    background-color: var(--bg-service) !important;
+}
+
+/* Dialog */
+.dialog, .dialog1 {
+    background-color: #1E293B !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
+}
+.bg .title, .lang-bg .title {
+    border-bottom-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+.lang-choose span {
+    background: var(--bg-service) !important;
+    color: var(--text-secondary) !important;
+    border-color: transparent !important;
+}
+.lang-choose span:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+}
+
+/* Offline dialog */
+.offline-item input {
+    background: var(--bg-service) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+.offline-item input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12) !important;
+    background: #1E293B !important;
+}
+
+/* Keywords */
+.keyword .swiper-slide {
+    color: var(--primary-light) !important;
+    border-color: rgba(139,92,246,0.3) !important;
+    background: rgba(139,92,246,0.08) !important;
+}
+.keyword .swiper-slide:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* Question list */
+#question_list div:hover {
+    color: var(--primary-light) !important;
+    background-color: rgba(139,92,246,0.06) !important;
+}
+
+/* About fieldset */
+.layui-elem-field {
+    border-color: var(--border-color) !important;
+}
+
+/* Time indicator */
+.showtime {
+    color: var(--text-light) !important;
+}
+.showtime::before,
+.showtime::after {
+    background: var(--border-color) !important;
+}
+
+/* Map box */
+.map_box {
+    background-color: #1E293B !important;
+}
+
+/* Layui overrides */
+.layui-input {
+    background-color: var(--bg-service) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* Links in conversation */
+.conversation li a {
+    color: var(--primary-light) !important;
+}
+
+/* Fuceng popup */
+#fuceng {
+    background: #1E293B !important;
+    border-color: var(--border-color) !important;
+}
+.fuceng-li {
+    color: var(--text-secondary) !important;
+}
+.fuceng-li:hover {
+    background-color: var(--bg-service) !important;
+    color: var(--primary-light) !important;
+}
+
+/* Main container shadow */
+body > div:first-of-type:not(.bg):not(.offline):not(.lang-bg):not(.msg-bg):not(.musk):not(.map_box) {
+    box-shadow: 0 20px 60px -10px rgba(99,102,241,0.2), 0 8px 20px -6px rgba(0,0,0,0.15) !important;
+}

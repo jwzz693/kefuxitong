@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <title>留言板</title>
+    <script>
+        ROOT_URL = '{:request()->root()}';
+    </script>
+    <script src="__libs__/jquery/jquery.min.js?v=__lkversion__" type="text/javascript"></script>
+    <script src="__libs__/layui/layui.js?v=__lkversion__" type="text/javascript"></script>
+        <script src="__libs__/jquery/jquery.cookie.js?v=__lkversion__" type="text/javascript"></script>
+    <link href="__libs__/layui/css/layui.css?v=__lkversion__" rel="stylesheet">
+    <link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+    <script src="__libs__/layer/layer.js?v=__lkversion__" type="text/javascript"></script>
+    <style type="text/css">
+        .msg-bg .title {
+            font-size: 19px;
+            text-align: center;
+            color: #fafafa;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: #5fb878;
+            padding: 13px;
+        }
+        .bg .title,.lang-bg .title {
+            font-size: 15px;
+            text-align: center;
+            color: #555555;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .layui-form-item {
+            float: left;
+        }
+    </style>
+
+</head>
+<body style="background: #ffff;">
+<div class="msg-bg" style="background: #ffff;">
+    <div class="dialog1" style="padding-bottom: 20px">
+        <div class="title">
+            <a href="javascript:history.back(-1)">
+                <i class="layui-icon" style="    float: left;
+    font-size: 24px;
+    color: #fff;">&#xe603;</i>
+            </a>
+            留言</div>
+        <div class="dialog-body lang-choose">
+            <div style="     margin-bottom: 20px;
+    padding: 5px 15px;
+    color: #ff9a00;
+    font-size: 16px;">您好，如果您有什么疑问请点此处留言，我们会尽快与您联系。</div>
+            <div class="layui-form-item layui-inline" style="margin-left: -42px;">
+                <label class="layui-form-label">联系人</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" placeholder="请输入您的称呼" class="layui-input" style=" width: 223px;">
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline" style="margin-left: -31px;">
+                <label class="layui-form-label">联系方式</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="contact" placeholder="请输入手机号/微信/QQ" class="layui-input" style=" width: 211px;">
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline" style="margin-left: -29px;">
+                <label class="layui-form-label">留言内容</label>
+                <div class="layui-input-inline">
+                    <textarea id="content" name="code"  class="layui-input" style="height: 140px;width: 208px;"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item layui-inline" style="text-align: center;margin-left: 82px;">
+                <button class="pear-btn pear-btn-md pear-btn-primary" id="config">
+                    <i class="layui-icon layui-icon-search"></i>
+                    立即提交
+                </button>
+                <button id="reset" class="pear-btn pear-btn-md">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--start-copyright-->
+</body>
+</html>
+
+<script type="text/javascript">
+
+
+    var change = function () {
+        var value = "";
+        $("#text").text(value);
+    }
+
+    function getQueryString(key) {
+        var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+        var result = window.location.search.substr(1).match(reg);
+        return result ? decodeURIComponent(result[2]) : null;
+    }
+
+
+    $('#reset').click(function () {
+        $('#content').val("");
+        $('#name').val("");
+        $('#contact').val("");
+    });
+    $('#config').click(function () {
+        var content=$('#content').val();
+        var name=$('#name').val();
+        var contact=$('#contact').val();
+        if(name==''){
+            layer.msg("请输入您的称呼",{icon:2});
+            return false;
+        }
+        if(contact==''){
+            layer.msg("请输入手机号/微信/QQ",{icon:2});
+            return false;
+        }
+        if(content==''){
+            layer.msg("请填写留言内容",{icon:2});
+            return false;
+        }
+        $.ajax({
+            url:"/index/index/set_msg",
+            type: "post",
+            data: {content:content,name:name,contact:contact,services: $.cookie('services')},
+            dataType:'json',
+            success:function(res){
+                if(res.code == 0){
+                    layer.msg(res.msg,{icon:2});
+                } else {
+                    layer.msg(res.msg,{icon:1});
+                    setTimeout(function(){
+                        window.location.reload();
+                    },2000)
+                }
+            }
+        });
+    });
+
+
+</script>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<script src="/static/js/cupload.js"></script>
+		<title>实名认证-在线客服系统-便宜的三方客服平台-网页客服系统-全渠道智能客服|客服系统</title>
+<meta name="keywords" content="网上客服系统,在线客服系统,智能客服,云客服系统,在线客服平台,IM客服软件,多渠道统一智能客服,全渠道客服系统">
+    <meta name="description" content="AI智能在线客服系统,支持网页、微信、微博、APP、邮件等全渠道覆盖接入。主动营销服务：专注线上转化。数据报表:种类繁多，细致全面，拥有300多种，为量化客服管理提供支持。30万+家企业用户正在使用AI智能客服提供的在线客服系统、智能客服、云客服系统、在线客服平台、IM客服软件、云客服平台、全渠道客服系统，AI智能客服为企业在线客服团队用户提速增效、优化服务体验。">
+    	<link rel="stylesheet" href="/static/component/pear/css/pear.css" />
+		<style>
+    </style>
+	</head>
+	<body>
+		<form class="layui-row layui-col-space10 layui-form">
+			<div class="layui-col-md12">
+				<div class="layui-card" style="margin-left: 20px;margin-top: 20px;">
+				      {if $bussstatus == '0'}
+				        <h4><div span style="text-align:left;">&nbsp;&nbsp;<a href="/">首页</a>&nbsp;/&nbsp;<a href="/service">商户后台</a>&nbsp;/&nbsp;<a href="#">实名认证</a></div></h4></br>
+				      
+							<div class="layui-card-header" style="text-align:center;"><div class="boy" style="color:#7f8081">尊敬的{$business['business_name']}，为配合国家网络安全管理，切实履行监督义务，请提交您的实名信息！	<button onclick="dianji()">退出登录</button></div></div>
+				
+                 </br>
+             
+                     </br> 
+                     </br>
+                     	<div class="boz" style="color:#fd641d">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="/index/images/jg.png" class="img-responsive fr">&nbsp;我们会严格保障您的个人信息安全。
+                     
+					</div>
+                     
+                     
+                     
+                     </br>
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>真实姓名:</label>
+						<div class="layui-input-block">
+							<input name="name" value="" class="layui-input" style="width: 400px;display: inline-block;margin-right: 10px"  placeholder="请输入真实姓名"/>
+
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>年龄:</label>
+						<div class="layui-input-block">
+							<input name="age" value="" class="layui-input" style="width: 400px;display: inline-block;margin-right: 10px"  placeholder="请输入您的年龄"/>
+
+						</div>
+					</div>
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>邮箱:</label>
+						<div class="layui-input-block">
+							<input name="maill" value="" class="layui-input" style="width: 400px;display: inline-block;margin-right: 10px"  placeholder="请输入常用邮箱"/>
+
+						</div>
+					</div>
+
+					<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>手机号:</label>
+						<div class="layui-input-block">
+							<input name="phone" value="" class="layui-input" style="width: 400px;display: inline-block;margin-right: 10px"  placeholder="请输入11位手机号"/>
+
+						</div>
+					</div>
+						<div class="layui-form-item" style="margin-top: 20px">
+						<label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>支付宝/微信号:</label>
+						<div class="layui-input-block">
+							<input name="zfb" value="" class="layui-input" style="width: 400px;display: inline-block;margin-right: 10px"  placeholder="请输入支付宝/微信号，其中一个"/>
+
+						</div>
+					</div>
+					
+
+                      <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>身份证正面:</label><img src="/index/images/rz1.png" class="img-responsive fr">
+                <div class="layui-input-inline">
+             		<div id="cupload-3"></div>
+                </div>
+            </div>
+              <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>身份证反面:</label><img src="/index/images/rz2.png" class="img-responsive fr">
+                <div class="layui-input-inline">
+             		<div id="cupload-4"></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>营业执照:</label><img src="/index/images/rz3.png" class="img-responsive fr">
+                <div class="layui-input-inline">
+             		<div id="cupload-5"></div>
+                </div>
+            </div>
+
+               <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 200px;text-align:center;"><a style="color:red">* </a>支付收款码:</label><img src="/index/images/rz4.png" class="img-responsive fr">
+                <div class="layui-input-inline">
+             		<div id="cupload-6"></div>
+                </div>
+            </div>
+            
+<style> 
+.box{ font-size:15px} 
+.box .f20{ font-size:16px}
+.boy{ font-size:14px} 
+.boz{ font-size:12px} 
+</style> 
+           
+
+					<div class="layui-input-block" style="min-height: 80px;">
+						<button type="submit" class="pear-btn pear-btn-primary" style="
+    margin-right: 25px;
+" lay-submit="" lay-filter="save">提交审核</button>
+				<a href="JavaScript:history.go(-1)" class="ms-btn color-hover">返回上级</a><br><br>
+				<div class="box" style="color:red">注意事项：</div><br>
+
+ 	<div class="boy" style="color:#fd641d">1.填写的实名信息必须真实有效。<br>
+				    2.支付宝/微信号/收款二维码必须同主体<br>3.所上传的图片必须清晰可见<br>4.资料只需提交一次,无需重复提交
+					</div>
+			
+				</div>
+			</div>
+		</form>
+		{/if}
+			  {if $bussstatus == '1'}
+		<div class="layui-card-header"><div class="boy" style="color:#7f8081"># 尊敬的({$business['business_name']})用户,您的实名信息于{$shenhetime}提交审核中！</div></div>
+	
+		   {/if}  
+ {if $bussstatus == '2'}
+		<div class="layui-card-header"><div class="boy" style="color:#7f8081"># 尊敬的({$business['business_name']})用户,您的实名信息已审核通过！</div></div>
+	
+		   {/if}
+		<script src="/static/component/layui/layui.js"></script>
+		<script src="/static/component/pear/pear.js"></script>
+		<script type="text/javascript" src="__libs__/jquery/jquery.min.js"></script>
+		<script>
+			layui.use(['form', 'jquery'], function () {
+			        let form = layui.form;
+			        let $ = layui.jquery;
+			
+			        form.on('submit(save)', function (data) {
+			            $.ajax({
+			                data: JSON.stringify(data.field),
+			                dataType: 'json',
+			                contentType: 'application/json',
+			                type: 'post',
+			                success: function (res) {
+			                    if (res.code === 1) {
+			                        layer.msg(res.msg, {
+			                            icon: 1
+			                        }, function() {
+			                            location.reload();
+			                        });
+			                    } else {
+			                        layer.msg(res.msg, {icon: 2, time: 1500})
+			                    }
+			                }
+			            });
+			            return false;
+			        });
+			    });
+			    function dianji(){
+			        console.log(111)
+			            $.ajax({
+                        url: "{:url('service/login/logout')}",
+                        type:"POST",
+                        dataType:"json",
+                        success: function(res) {
+                            if (res.code==1) {
+                                layer.msg(res.msg, {
+                                    icon: 1
+                                });
+                                setTimeout(function() {
+                                    location.href = "{:url('service/login/index')}";
+                                }, 333)
+                            }
+                        }
+                    });
+			    }
+			var cupload3 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-3',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload4 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-4',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload5 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-5',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload6 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-6',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+			var cupload7 = new Cupload ({
+			name: "img",
+			ele	 : '#cupload-7',
+			num  : 1,
+			url  : '/service/certification/upload',
+		});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,235 @@
+/* ============================
+   Chat UI - Business/Professional Theme
+   Indigo & elegant corporate style
+   ============================ */
+
+:root {
+    --primary: #4F46E5;
+    --primary-light: #818CF8;
+    --primary-dark: #4338CA;
+    --primary-glow: rgba(79,70,229,0.2);
+    --accent: #EC4899;
+    --accent-light: #F472B6;
+    --bg-page: #F5F3FF;
+    --bg-chat: #FFFFFF;
+    --bg-service: #EEF2FF;
+    --bg-sidebar: #F5F3FF;
+    --text-main: #1E1B4B;
+    --text-secondary: #4338CA;
+    --text-light: #6366F1;
+    --text-white: #FFFFFF;
+    --border-color: #E0E7FF;
+    --border-light: #EEF2FF;
+}
+
+body {
+    background: var(--bg-page) !important;
+    font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft Yahei", sans-serif !important;
+}
+
+/* Header - Business with gradient */
+.header {
+    height: 68px !important;
+    line-height: 68px !important;
+    background: linear-gradient(135deg, #1E1B4B 0%, #312E81 40%, #4338CA 100%) !important;
+    box-shadow: 0 4px 20px rgba(67,56,202,0.25) !important;
+    font-size: 16px !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Chat content area */
+.content {
+    background-color: var(--bg-chat) !important;
+    background-image:
+        radial-gradient(ellipse at 15% 85%, rgba(99,102,241,0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 15%, rgba(236,72,153,0.02) 0%, transparent 50%) !important;
+}
+
+/* Service bubbles - Business style */
+.service {
+    background-color: var(--bg-service) !important;
+    color: var(--text-main) !important;
+    padding: 13px 18px !important;
+    border-radius: 16px !important;
+    border-bottom-left-radius: 4px !important;
+    border: 1px solid rgba(99,102,241,0.08) !important;
+    box-shadow: 0 1px 4px rgba(79,70,229,0.06) !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+/* Customer bubbles - Business style */
+.customer {
+    background: linear-gradient(135deg, #4338CA 0%, #6366F1 100%) !important;
+    padding: 13px 18px !important;
+    border-radius: 16px !important;
+    border-bottom-right-radius: 4px !important;
+    font-size: 14px !important;
+    box-shadow: 0 3px 12px var(--primary-glow) !important;
+}
+
+/* Message spacing */
+.chatmsg, .chatmsg_no {
+    margin-bottom: 24px !important;
+}
+
+.conversation {
+    padding-top: 30px !important;
+    width: 58% !important;
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid var(--border-color) !important;
+    background: linear-gradient(to top, #FAFAFE, #FFFFFF) !important;
+}
+
+/* Send button */
+.msg-toolbar-footer .msg-send-btn {
+    background: linear-gradient(135deg, #4338CA, #6366F1) !important;
+    box-shadow: 0 3px 10px var(--primary-glow) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    border-radius: 10px 0 0 10px !important;
+}
+.msg-toolbar-footer .msg-send-btn:hover {
+    box-shadow: 0 6px 20px rgba(79,70,229,0.3) !important;
+}
+.msg-toolbar-footer .showinfo {
+    background: linear-gradient(135deg, #4338CA, #6366F1) !important;
+    border-radius: 0 10px 10px 0 !important;
+}
+
+/* Toolbar */
+.msg-toolbar a:hover {
+    background-color: rgba(99,102,241,0.08) !important;
+}
+
+/* Sidebar */
+#xxxx {
+    background: var(--bg-sidebar) !important;
+    border-left: 1px solid var(--border-color) !important;
+}
+
+/* Tabs */
+.layui-tab-brief > .layui-tab-title .layui-this {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+}
+.layui-tab-brief > .layui-tab-more li.layui-this:after,
+.layui-tab-brief > .layui-tab-title .layui-this:after {
+    border-bottom-color: var(--primary) !important;
+    border-bottom-width: 3px !important;
+}
+.layui-tab-brief > .layui-tab-title li {
+    font-weight: 500;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px !important; }
+::-webkit-scrollbar-thumb {
+    background-color: rgba(99,102,241,0.15) !important;
+    border-radius: 10px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(99,102,241,0.3) !important;
+}
+
+/* Keywords */
+.keyword .swiper-slide {
+    color: var(--primary) !important;
+    border-color: rgba(99,102,241,0.25) !important;
+    background: rgba(99,102,241,0.06) !important;
+    border-radius: 16px !important;
+    font-weight: 600 !important;
+}
+.keyword .swiper-slide:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+    border-color: var(--primary) !important;
+}
+
+/* Question list */
+#question_list div {
+    border-radius: 8px !important;
+    padding: 8px 6px !important;
+}
+#question_list div:hover {
+    color: var(--primary) !important;
+    background-color: rgba(99,102,241,0.06) !important;
+}
+
+/* Dialog */
+.dialog {
+    border-radius: 20px !important;
+    box-shadow: 0 24px 70px rgba(30,27,75,0.18) !important;
+}
+.lang-choose span {
+    border-radius: 12px !important;
+    font-weight: 500 !important;
+}
+.lang-choose span:hover {
+    background: linear-gradient(135deg, #4338CA, #6366F1) !important;
+    color: #fff !important;
+}
+
+/* Evaluate */
+button.submit {
+    background: linear-gradient(135deg, #4338CA, #6366F1) !important;
+    border-radius: 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4px !important;
+}
+button.submit:hover {
+    box-shadow: 0 6px 20px rgba(79,70,229,0.3) !important;
+}
+button.reset {
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+}
+
+/* Avatar */
+.my-circle {
+    width: 50px !important;
+    height: 50px !important;
+    border: 2.5px solid #fff !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1) !important;
+}
+
+/* Time indicator */
+.showtime {
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    color: var(--text-light) !important;
+}
+.showtime::before,
+.showtime::after {
+    width: 40px !important;
+    background: var(--border-color) !important;
+}
+
+/* Links in conversation */
+.conversation li a {
+    color: var(--primary) !important;
+    text-decoration-color: rgba(99,102,241,0.3) !important;
+}
+.conversation li a:hover {
+    text-decoration-color: var(--primary) !important;
+}
+
+/* Main container shadow */
+body > div:first-of-type:not(.bg):not(.offline):not(.lang-bg):not(.msg-bg):not(.musk):not(.map_box) {
+    box-shadow: 0 24px 70px -10px rgba(67,56,202,0.18), 0 10px 24px -8px rgba(0,0,0,0.06) !important;
+    border-radius: 20px !important;
+}
+
+/* Msg title */
+.msg-bg .title {
+    background: linear-gradient(135deg, #4338CA, #6366F1) !important;
+}
+
+/* Offline form */
+.offline-item input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+}

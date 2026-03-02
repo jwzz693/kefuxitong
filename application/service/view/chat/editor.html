@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="__libs__/layui/css/layui.css" rel="stylesheet">
+    <script type="text/javascript" src="__libs__/jquery/jquery.min.js"></script>
+    <script src="/static/component/layui/layui.js"></script>
+<script src="__libs__/jquery/jquery.cookie.js" type="text/javascript"></script>
+</head>
+<body>
+    <form class="layui-form reply-form" style="margin-top:20px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label" for="tag">标签</label>
+            <div class="layui-input-block">
+                <input id="tag" type="text" class="layui-input" style="width:552px" />
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label" for="word">快捷用语</label>
+            <div class="layui-input-block">
+                <textarea class="editormd-markdown-textarea" name="aboutus" id="a_editormd" style="height: 260px;width: 600px;"></textarea>
+            </div>
+        </div>
+    </form>
+</body>
+<script type="text/javascript" src="__assets__/ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__assets__/ueditor/ueditor.all.js"></script>
+<script>
+    var editorOption = {
+        UEDITOR_HOME_URL: "__assets__/ueditor/",
+        UEDITOR_ROOT_URL: "__assets__/ueditor/",
+        serverUrl: "{:url('/service/upload/ueditor',['action'=>'config','service_id'=>$_SESSION['Msg']['service_id'],'admin_id'=>0])}",
+        lang: "zh-cn",
+        toolbars: [["source","undo", "redo", "|", "bold", "italic", "underline", "fontborder", "strikethrough", "superscript", "subscript", "removeformat", "formatmatch", "autotypeset", "blockquote", "pasteplain", "|", "forecolor", "backcolor",  "selectall", "cleardoc", "|","lineheight", "|", "customstyle", "paragraph", "fontfamily", "fontsize", "|",  "link", "unlink","|", "simpleupload", "insertimage", "emotion","insertvideo"]],
+        initialContent: "",
+        pageBreakTag: "_ueditor_page_break_tag_",
+        initialFrameWidth: "100%",
+        initialFrameHeight: "260",
+        initialStyle: "body{font-size:14px}",
+        autoFloatEnabled: false,
+        allowDivTransToP: true,
+        autoHeightEnabled: false,
+        charset: "utf-8",
+    };
+    var DomUe=UE.getEditor("a_editormd",editorOption)
+    DomUe.onEditorChange=function(editor, html, text){
+        console.log(1)
+    }
+</script>;
+</html>
