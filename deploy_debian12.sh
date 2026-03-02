@@ -226,11 +226,22 @@ ok "PHP 7.4 安装并配置完成 (${PHP_VER})"
 # ======================== 步骤 4: 安装 MariaDB ========================
 step 4 "安装并配置数据库"
 
-# 检测已有数据库
+# 检测已有数据库（需要同时检测客户端命令和服务端包）
+DB_NEED_INSTALL=false
 if command -v mysql &>/dev/null || command -v mariadb &>/dev/null; then
-    info "检测到已安装 MySQL/MariaDB"
+    # 有客户端命令，需检查服务端是否也安装了
+    if dpkg -l mariadb-server 2>/dev/null | grep -q '^ii' || dpkg -l mysql-server 2>/dev/null | grep -q '^ii'; then
+        info "检测到已安装 MySQL/MariaDB (服务端+客户端)"
+    else
+        warn "仅检测到数据库客户端，服务端未安装，将自动安装..."
+        DB_NEED_INSTALL=true
+    fi
 else
     info "未检测到数据库，正在自动安装 MariaDB..."
+    DB_NEED_INSTALL=true
+fi
+
+if [[ "$DB_NEED_INSTALL" == "true" ]]; then
     apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 安装失败"
     ok "MariaDB 安装完成"
 fi
@@ -263,16 +274,49 @@ for _i in $(seq 1 30); do
 done
 
 if [[ "$DB_READY" != "true" ]]; then
-    warn "数据库服务无法启动，尝试重新安装..."
-    apt-get remove -y --purge mariadb-server mariadb-client >/dev/null 2>&1 || true
-    apt-get autoremove -y >/dev/null 2>&1 || true
-    rm -rf /var/lib/mysql 2>/dev/null || true
+    warn "数据库服务无法启动，彻底清理后重新安装..."
+
+    # 1) 停止所有数据库相关进程
+    systemctl stop mariadb 2>/dev/null || true
+    systemctl stop mysql 2>/dev/null || true
+    systemctl stop mysqld 2>/dev/null || true
+    killall -9 mysqld mariadbd mysqld_safe 2>/dev/null || true
+    sleep 1
+
+    # 2) 彻底卸载所有 MySQL/MariaDB 包
+    apt-get remove -y --purge 'mariadb-*' 'mysql-*' 'galera-*' >/dev/null 2>&1 || true
+    apt-get autoremove -y --purge >/dev/null 2>&1 || true
+    dpkg --purge $(dpkg -l | grep -iE 'mariadb|mysql|galera' | awk '{print $2}') 2>/dev/null || true
+
+    # 3) 彻底删除所有残留数据和配置
+    rm -rf /var/lib/mysql /var/lib/mysql-* /var/lib/mysql-files /var/lib/mysql-keyring 2>/dev/null || true
+    rm -rf /etc/mysql /etc/mysql* 2>/dev/null || true
+    rm -rf /var/log/mysql /var/log/mysql* 2>/dev/null || true
+    rm -rf /run/mysqld /var/run/mysqld 2>/dev/null || true
+    rm -f /tmp/mysql.sock /tmp/mysqld.sock 2>/dev/null || true
+
+    # 4) 重建必要目录
+    mkdir -p /var/run/mysqld
+    chown mysql:mysql /var/run/mysqld 2>/dev/null || true
+
+    # 5) 全新安装
+    info "执行全新安装 MariaDB..."
+    apt-get update -qq >/dev/null 2>&1 || true
     apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 重装失败"
-    systemctl start mariadb || err "MariaDB 启动失败"
+
+    # 6) 如果 systemd 服务还是不行，手动初始化数据目录
+    if ! systemctl start mariadb 2>/dev/null; then
+        warn "首次启动失败，尝试手动初始化数据目录..."
+        mysql_install_db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || \
+        mariadb-install-db --user=mysql --datadir=/var/lib/mysql >/dev/null 2>&1 || true
+        chown -R mysql:mysql /var/lib/mysql 2>/dev/null || true
+        systemctl start mariadb || err "MariaDB 启动失败（已尝试手动初始化）\n请执行: journalctl -xeu mariadb.service 查看详细日志"
+    fi
+
     systemctl enable mariadb >/dev/null 2>&1 || true
     sleep 3
-    mysqladmin ping >/dev/null 2>&1 || err "数据库多次安装失败，请手动检查系统环境"
-    ok "数据库重装成功"
+    mysqladmin ping >/dev/null 2>&1 || err "数据库多次安装失败，请执行: journalctl -xeu mariadb.service 查看日志"
+    ok "数据库彻底重装成功"
 fi
 
 # ---- 确定 root 连接认证方式 ----
