@@ -30,6 +30,11 @@
 # 仅检查未定义变量，不用 -e/-o pipefail（部署脚本需要逐步容错）
 set -u
 
+DEPLOY_LOG="${DEPLOY_LOG:-/tmp/kefuxitong_deploy_$(date +%Y%m%d_%H%M%S).log}"
+mkdir -p "$(dirname "$DEPLOY_LOG")" >/dev/null 2>&1 || true
+touch "$DEPLOY_LOG" >/dev/null 2>&1 || true
+exec > >(tee -a "$DEPLOY_LOG") 2>&1
+
 # ======================== 颜色输出 ========================
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -44,6 +49,58 @@ err()   { echo -e "${RED}[FAIL]${NC} $*"; exit 1; }
 step()  { echo -e "\n${GREEN}━━━ 步骤 $1/${TOTAL_STEPS}: $2 ━━━${NC}"; }
 
 TOTAL_STEPS=12
+
+retry_cmd() {
+    local max_attempts="${1:-3}"
+    local sleep_seconds="${2:-2}"
+    shift 2
+    local attempt=1
+    until "$@"; do
+        if [[ "$attempt" -ge "$max_attempts" ]]; then
+            return 1
+        fi
+        warn "命令失败，${sleep_seconds}s 后重试 (${attempt}/${max_attempts}): $*"
+        sleep "$sleep_seconds"
+        attempt=$((attempt + 1))
+    done
+    return 0
+}
+
+wait_for_apt_lock() {
+    local timeout=120
+    local waited=0
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
+        if [[ "$waited" -ge "$timeout" ]]; then
+            warn "apt 锁等待超时，尝试继续执行"
+            return 0
+        fi
+        warn "检测到 apt/dpkg 正在运行，等待释放锁..."
+        sleep 3
+        waited=$((waited + 3))
+    done
+    return 0
+}
+
+print_preflight() {
+    local mem_mb disk_gb cpu_arch kernel
+    mem_mb=$(awk '/MemTotal/ {printf "%d", $2/1024}' /proc/meminfo 2>/dev/null || echo "0")
+    disk_gb=$(df -BG / 2>/dev/null | awk 'NR==2{gsub("G","",$4); print $4+0}' || echo "0")
+    cpu_arch=$(uname -m 2>/dev/null || echo "unknown")
+    kernel=$(uname -r 2>/dev/null || echo "unknown")
+
+    info "环境预检信息:"
+    info "  CPU架构:       ${cpu_arch}"
+    info "  内核版本:      ${kernel}"
+    info "  内存(MB):      ${mem_mb}"
+    info "  根分区剩余(GB): ${disk_gb}"
+
+    if [[ "$mem_mb" -lt 800 ]]; then
+        warn "可用内存较低(<800MB)，部署可继续但可能较慢"
+    fi
+    if [[ "$disk_gb" -lt 3 ]]; then
+        err "根分区剩余空间不足 3GB，请先扩容后再部署"
+    fi
+}
 
 # ======================== 前置检查 ========================
 if [[ $(id -u) -ne 0 ]]; then
@@ -117,7 +174,13 @@ mysql_root_exec() {
 sanitize_mariadb_config() {
     local changed=0
     local cfg
-    for cfg in /etc/my.cnf /etc/mysql/my.cnf /etc/mysql/mariadb.conf.d/*.cnf /etc/mysql/conf.d/*.cnf; do
+    for cfg in \
+        /etc/my.cnf \
+        /etc/mysql/my.cnf \
+        /etc/mysql/mariadb.conf.d/*.cnf \
+        /etc/mysql/conf.d/*.cnf \
+        /www/server/mysql/my.cnf \
+        /www/server/mysql/*.cnf; do
         [[ -f "$cfg" ]] || continue
 
         if grep -qiE '^\s*early-plugin-load\s*=' "$cfg" 2>/dev/null; then
@@ -127,8 +190,33 @@ sanitize_mariadb_config() {
         fi
     done
 
+    # 从 journal 自动提取 unknown variable，并在配置中移除对应项
+    local unknown_vars raw_var
+    unknown_vars=$(journalctl -u mariadb.service -n 120 --no-pager 2>/dev/null | sed -n "s/.*unknown variable '\([^']*\)'.*/\1/p" | sort -u)
+    if [[ -n "$unknown_vars" ]]; then
+        for raw_var in $unknown_vars; do
+            local opt_name
+            opt_name="${raw_var%%=*}"
+            [[ -z "$opt_name" ]] && continue
+            for cfg in \
+                /etc/my.cnf \
+                /etc/mysql/my.cnf \
+                /etc/mysql/mariadb.conf.d/*.cnf \
+                /etc/mysql/conf.d/*.cnf \
+                /www/server/mysql/my.cnf \
+                /www/server/mysql/*.cnf; do
+                [[ -f "$cfg" ]] || continue
+                if grep -qiE "^\s*${opt_name}\s*=" "$cfg" 2>/dev/null; then
+                    cp -a "$cfg" "${cfg}.bak.$(date +%s)" 2>/dev/null || true
+                    sed -i -E "/^\s*${opt_name}\s*=.*/Id" "$cfg"
+                    changed=1
+                fi
+            done
+        done
+    fi
+
     if [[ "$changed" -eq 1 ]]; then
-        warn "检测到并已移除 MariaDB 非法参数 early-plugin-load="
+        warn "检测到并已自动清理 MariaDB 非法参数（含 unknown variable 项）"
     fi
 }
 
@@ -141,6 +229,9 @@ echo -e "${GREEN}============================================${NC}"
 echo -e "${GREEN}   客服系统 Debian 12 全自动部署${NC}"
 echo -e "${GREEN}============================================${NC}"
 echo ""
+info "部署日志文件: ${DEPLOY_LOG}"
+print_preflight
+wait_for_apt_lock
 
 # 自动检测或使用环境变量
 DOMAIN="${DOMAIN:-$(get_public_ip)}"
@@ -182,13 +273,13 @@ echo ""
 # ======================== 步骤 1: 系统更新 ========================
 step 1 "更新系统软件包"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq >/dev/null 2>&1 || warn "apt-get update 有警告，继续..."
-apt-get upgrade -y -qq -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" >/dev/null 2>&1 || warn "apt-get upgrade 有警告，继续..."
+retry_cmd 3 3 apt-get update -qq >/dev/null 2>&1 || warn "apt-get update 有警告，继续..."
+retry_cmd 2 3 apt-get upgrade -y -qq -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" >/dev/null 2>&1 || warn "apt-get upgrade 有警告，继续..."
 ok "系统更新完成"
 
 # ======================== 步骤 2: 安装基础工具 ========================
 step 2 "安装基础工具"
-apt-get install -y -qq \
+retry_cmd 3 3 apt-get install -y -qq \
     curl wget git unzip zip lsof net-tools \
     software-properties-common apt-transport-https \
     ca-certificates gnupg2 cron procps openssl >/dev/null 2>&1 || err "基础工具安装失败"
@@ -261,7 +352,7 @@ else
 fi
 
 if [[ "$DB_NEED_INSTALL" == "true" ]]; then
-    apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 安装失败"
+    retry_cmd 3 3 apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 安装失败"
     ok "MariaDB 安装完成"
 fi
 
@@ -330,7 +421,7 @@ if [[ "$DB_READY" != "true" ]]; then
     # 5) 全新安装并补齐 dpkg 配置
     info "执行全新安装 MariaDB..."
     apt-get update -qq >/dev/null 2>&1 || true
-    apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 重装失败"
+    retry_cmd 3 3 apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 重装失败"
     dpkg --configure -a >/dev/null 2>&1 || true
     sanitize_mariadb_config
 
