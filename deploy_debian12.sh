@@ -113,6 +113,25 @@ mysql_root_exec() {
     fi
 }
 
+# ======================== MariaDB 配置自愈（清理非法参数）========================
+sanitize_mariadb_config() {
+    local changed=0
+    local cfg
+    for cfg in /etc/my.cnf /etc/mysql/my.cnf /etc/mysql/mariadb.conf.d/*.cnf /etc/mysql/conf.d/*.cnf; do
+        [[ -f "$cfg" ]] || continue
+
+        if grep -qiE '^\s*early-plugin-load\s*=' "$cfg" 2>/dev/null; then
+            cp -a "$cfg" "${cfg}.bak.$(date +%s)" 2>/dev/null || true
+            sed -i -E '/^\s*early-plugin-load\s*=.*/Id' "$cfg"
+            changed=1
+        fi
+    done
+
+    if [[ "$changed" -eq 1 ]]; then
+        warn "检测到并已移除 MariaDB 非法参数 early-plugin-load="
+    fi
+}
+
 MYSQL_AUTH_MODE="socket"
 MYSQL_ROOT_ACTUAL_PASS=""
 
@@ -256,9 +275,11 @@ for svc in mariadb mysql mysqld; do
 done
 
 if [[ -n "$DB_SERVICE" ]]; then
+    sanitize_mariadb_config
     systemctl start "$DB_SERVICE" 2>/dev/null || true
     systemctl enable "$DB_SERVICE" >/dev/null 2>&1 || true
 else
+    sanitize_mariadb_config
     systemctl start mariadb 2>/dev/null || systemctl start mysql 2>/dev/null || true
 fi
 
@@ -311,6 +332,7 @@ if [[ "$DB_READY" != "true" ]]; then
     apt-get update -qq >/dev/null 2>&1 || true
     apt-get install -y -qq mariadb-server mariadb-client >/dev/null 2>&1 || err "MariaDB 重装失败"
     dpkg --configure -a >/dev/null 2>&1 || true
+    sanitize_mariadb_config
 
     # 6) 启动服务；失败则手动初始化 + fallback 启动
     if ! systemctl start mariadb 2>/dev/null; then
