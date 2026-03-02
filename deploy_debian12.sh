@@ -102,6 +102,33 @@ print_preflight() {
     fi
 }
 
+detect_mysql_socket() {
+    local s
+    for s in \
+        /run/mysqld/mysqld.sock \
+        /var/run/mysqld/mysqld.sock \
+        /tmp/mysql.sock \
+        /tmp/mysqld.sock \
+        /www/server/mysql/mysql.sock \
+        /www/server/mysql/mysqld.sock; do
+        if [[ -S "$s" ]]; then
+            echo "$s"
+            return 0
+        fi
+    done
+    return 1
+}
+
+mysqladmin_ping() {
+    local sock
+    sock=$(detect_mysql_socket 2>/dev/null || true)
+    if [[ -n "$sock" ]]; then
+        mysqladmin --protocol=socket -S "$sock" ping >/dev/null 2>&1
+    else
+        mysqladmin ping >/dev/null 2>&1
+    fi
+}
+
 # ======================== 前置检查 ========================
 if [[ $(id -u) -ne 0 ]]; then
     err "请以 root 用户运行此脚本: sudo bash $0"
@@ -161,12 +188,37 @@ get_public_ip() {
 # ======================== MySQL 命令封装（安全处理密码特殊字符）========================
 # 用函数包装，避免 $MYSQL_ROOT_CMD 字符串展开时密码被 word split
 mysql_root_exec() {
+    local sock
+    sock=$(detect_mysql_socket 2>/dev/null || true)
+
     if [[ "$MYSQL_AUTH_MODE" == "socket" ]]; then
-        mysql -uroot "$@"
+        if [[ -n "$sock" ]]; then
+            mysql --protocol=socket -S "$sock" -uroot "$@"
+        else
+            mysql -h 127.0.0.1 -uroot "$@"
+        fi
     elif [[ "$MYSQL_AUTH_MODE" == "password" ]]; then
-        mysql -uroot -p"${MYSQL_ROOT_ACTUAL_PASS}" "$@"
+        if [[ -n "$sock" ]]; then
+            mysql --protocol=socket -S "$sock" -uroot -p"${MYSQL_ROOT_ACTUAL_PASS}" "$@"
+        else
+            mysql -h 127.0.0.1 -uroot -p"${MYSQL_ROOT_ACTUAL_PASS}" "$@"
+        fi
     else
-        mysql -uroot "$@"
+        if [[ -n "$sock" ]]; then
+            mysql --protocol=socket -S "$sock" -uroot "$@"
+        else
+            mysql -h 127.0.0.1 -uroot "$@"
+        fi
+    fi
+}
+
+mysql_app_exec() {
+    local sock
+    sock=$(detect_mysql_socket 2>/dev/null || true)
+    if [[ -n "$sock" ]]; then
+        mysql --protocol=socket -S "$sock" -u"${DB_USER}" -p"${DB_PASS}" "$@"
+    else
+        mysql -h 127.0.0.1 -u"${DB_USER}" -p"${DB_PASS}" "$@"
     fi
 }
 
@@ -378,7 +430,7 @@ fi
 info "等待数据库服务就绪..."
 DB_READY=false
 for _i in $(seq 1 30); do
-    if mysqladmin ping >/dev/null 2>&1; then
+    if mysqladmin_ping; then
         DB_READY=true
         break
     fi
@@ -436,13 +488,13 @@ if [[ "$DB_READY" != "true" ]]; then
             warn "再次失败，尝试 mysqld_safe 回退启动..."
             nohup mysqld_safe --user=mysql --datadir=/var/lib/mysql >/var/log/mysql_fallback.log 2>&1 &
             sleep 5
-            mysqladmin ping >/dev/null 2>&1 || err "MariaDB 启动失败（systemd + fallback 均失败）\n请执行: journalctl -xeu mariadb.service"
+            mysqladmin_ping || err "MariaDB 启动失败（systemd + fallback 均失败）\n请执行: journalctl -xeu mariadb.service"
         fi
     fi
 
     systemctl enable mariadb >/dev/null 2>&1 || true
     sleep 3
-    mysqladmin ping >/dev/null 2>&1 || err "数据库多次安装失败，请执行: journalctl -xeu mariadb.service 查看日志"
+    mysqladmin_ping || err "数据库多次安装失败，请执行: journalctl -xeu mariadb.service 查看日志"
     ok "数据库自愈重装成功"
 fi
 
@@ -530,14 +582,32 @@ mysql_root_exec -e "FLUSH PRIVILEGES;" 2>/dev/null || true
 
 # ---- 创建项目数据库和用户 ----
 info "创建数据库: ${DB_NAME}  用户: ${DB_USER}..."
-mysql_root_exec -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;" || err "创建数据库失败"
+if ! mysql_root_exec -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"; then
+    warn "创建数据库失败，输出诊断信息（已写入日志）..."
+    mysql_root_exec -e "SELECT USER() AS user, CURRENT_USER() AS current_user;" 2>/dev/null || true
+    mysql_root_exec -e "SHOW VARIABLES LIKE 'version%';" 2>/dev/null || true
+    mysql_root_exec -e "SHOW VARIABLES LIKE 'datadir';" 2>/dev/null || true
+    mysql_root_exec -e "SHOW GRANTS FOR CURRENT_USER();" 2>/dev/null || true
+    err "创建数据库失败"
+fi
 mysql_root_exec -e "DROP USER IF EXISTS '${DB_USER}'@'localhost';" 2>/dev/null || true
-mysql_root_exec -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';" || err "创建数据库用户失败"
-mysql_root_exec -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';" || err "授权数据库用户失败"
+if ! mysql_root_exec -e "CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"; then
+    warn "创建数据库用户失败，输出诊断信息（已写入日志）..."
+    mysql_root_exec -e "SELECT USER() AS user, CURRENT_USER() AS current_user;" 2>/dev/null || true
+    mysql_root_exec -e "SELECT Host,User,plugin FROM mysql.user WHERE User='${DB_USER}' OR User='root' LIMIT 20;" 2>/dev/null || true
+    err "创建数据库用户失败"
+fi
+
+if ! mysql_root_exec -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"; then
+    warn "授权数据库用户失败，输出诊断信息（已写入日志）..."
+    mysql_root_exec -e "SHOW GRANTS FOR '${DB_USER}'@'localhost';" 2>/dev/null || true
+    mysql_root_exec -e "SHOW GRANTS FOR CURRENT_USER();" 2>/dev/null || true
+    err "授权数据库用户失败"
+fi
 mysql_root_exec -e "FLUSH PRIVILEGES;"
 
 # 验证项目账号连接
-if mysql -u"${DB_USER}" -p"${DB_PASS}" -e "SELECT 1;" "${DB_NAME}" >/dev/null 2>&1; then
+if mysql_app_exec -e "SELECT 1;" "${DB_NAME}" >/dev/null 2>&1; then
     ok "数据库创建并验证成功: ${DB_NAME} (用户: ${DB_USER})"
 else
     warn "数据库用户验证失败，后续导入将使用 root"
@@ -580,7 +650,7 @@ if [[ -f "$SQL_FILE" ]]; then
     info "正在导入 ${SQL_SIZE} SQL 数据..."
     IMPORT_OK=false
     # 优先用项目用户导入
-    if mysql -u"${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" < "$SQL_FILE" 2>/dev/null; then
+    if mysql_app_exec "${DB_NAME}" < "$SQL_FILE" 2>/dev/null; then
         IMPORT_OK=true
     else
         warn "项目用户导入失败，使用 root 重试..."
@@ -591,7 +661,7 @@ if [[ -f "$SQL_FILE" ]]; then
         fi
     fi
     # 统计表数量
-    TABLE_COUNT=$(mysql -u"${DB_USER}" -p"${DB_PASS}" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null) || \
+    TABLE_COUNT=$(mysql_app_exec -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null) || \
     TABLE_COUNT=$(mysql_root_exec -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}';" 2>/dev/null) || \
     TABLE_COUNT="?"
     ok "数据库导入完成，共 ${TABLE_COUNT} 张表"
